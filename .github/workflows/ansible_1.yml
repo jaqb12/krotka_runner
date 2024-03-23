@@ -22,7 +22,7 @@ jobs:
 
       - name: Install pip
         run: |
-          whami
+          whoami
           su nobody -c "apt-get update"
           #sudo -E apt-get update
           #sudo -E apt-get install python3-pip -y
