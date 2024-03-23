@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          node-version: '20'
 
       - name: Install pip
         run: |
@@ -49,6 +51,8 @@ jobs:
 
       - name: Install Ansible
         run: pip install ansible
+        with:
+          node-version: '20'
 
       - name: Run Ansible Ping Module
         run: ansible localhost -m ping
