@@ -1,4 +1,5 @@
-name: Ansible_1
+
+whaminame: Ansible_1
 
 # Controls when the workflow will run
 on:
@@ -21,6 +22,7 @@ jobs:
 
       - name: Install pip
         run: |
+          whami
           su nobody -c "apt-get update"
           #sudo -E apt-get update
           #sudo -E apt-get install python3-pip -y
