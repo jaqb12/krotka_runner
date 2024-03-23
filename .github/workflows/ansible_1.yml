@@ -21,8 +21,9 @@ jobs:
 
       - name: Install pip
         run: |
-          sudo -E apt-get update
-          sudo -E apt-get install python3-pip -y
+          su nobody -c "apt-get update"
+          #sudo -E apt-get update
+          #sudo -E apt-get install python3-pip -y
 
       - name: Check pip version
         run: |
