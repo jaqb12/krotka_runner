@@ -22,6 +22,10 @@ jobs:
 
       - name: Install pip
         run: |
+          echo pwd
+          pwd
+          echo ls
+          ls
           sudo apt-get update
           sudo apt-get install python3-pip -y
 
