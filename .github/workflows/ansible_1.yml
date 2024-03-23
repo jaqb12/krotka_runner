@@ -1,0 +1,44 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  #push:
+  #  branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  install_ansible:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Create virtual environment
+        run: python -m venv ansible_venv
+
+      - name: Activate virtual environment
+        run: |
+          source ansible_venv/bin/activate
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip
+
+      - name: Install Ansible Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Run Ansible Ping Module
+        run: ansible localhost -m ping
