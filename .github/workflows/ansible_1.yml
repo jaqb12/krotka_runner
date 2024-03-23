@@ -51,8 +51,6 @@ jobs:
 
       - name: Install Ansible
         run: pip install ansible
-        with:
-          node-version: '20'
 
       - name: Run Ansible Ping Module
         run: ansible localhost -m ping
