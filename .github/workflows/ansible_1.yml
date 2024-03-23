@@ -25,7 +25,9 @@ jobs:
           echo pwd
           pwd
           echo ls
-          ls
+          ls -la
+          echo tree
+          tree
           sudo apt-get update
           sudo apt-get install python3-pip -y
 
