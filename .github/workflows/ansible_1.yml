@@ -24,7 +24,6 @@ jobs:
 
       - name: Install pip
         run: |
-          echo passwd: "${{ LSRV01PASSWD }}"
           echo passwd: $LSRV01PASSWD
           echo pwd
           pwd
