@@ -32,7 +32,7 @@ jobs:
           echo tree
           tree
           sudo apt-get update
-          sudo apt-get install python3-pip -y
+          sudo apt-get install python3-pip sshpass -y
 
       - name: Check pip version
         run: |
