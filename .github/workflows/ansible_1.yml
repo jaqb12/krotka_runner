@@ -16,7 +16,7 @@ on:
 jobs:
   install_ansible:
     env:
-      LSRV01_PASSWD: ${{ secrets.LSRV01_PASSWD }}
+      LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -24,6 +24,7 @@ jobs:
 
       - name: Install pip
         run: |
+          echo passwd: {{ LSRV01PASSWD }}
           echo pwd
           pwd
           echo ls
