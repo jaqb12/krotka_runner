@@ -60,7 +60,7 @@ jobs:
         run: ansible --version
       
       - name: Ansible inventory
-        run: ansible-inventory --list
+        run: ansible-inventory -i inventory.yml --list
 
       
       - name: Run Ansible Ping Module
