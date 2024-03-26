@@ -59,5 +59,9 @@ jobs:
       - name: Ansible version
         run: ansible --version
       
+      - name: Ansible inventory
+        run: ansible-inventory --list
+
+      
       - name: Run Ansible Ping Module
         run: ansible localhost -m ping
