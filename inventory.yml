@@ -3,4 +3,4 @@ ungrouped:
     lsrv-01.local:
     192.168.1.202:
       ansible_user: piotr
-      ansible_password: "{{ LSRV01_PASSWD }}"
+      ansible_password: $LSRV01PASSWD
