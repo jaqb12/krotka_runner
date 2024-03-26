@@ -53,11 +53,11 @@ jobs:
       - name: Upgrade pip
         run: pip install --upgrade pip
 
-      #- name: Install Ansible Dependencies
-      #  run: pip install -r requirements.txt
+      - name: Install Ansible Dependencies
+        run: pip install -r requirements.txt
 
-      - name: Install Ansible
-        run: pip install ansible
+      # - name: Install Ansible
+      #   run: pip install ansible
 
       - name: Ansible version
         run: ansible --version
