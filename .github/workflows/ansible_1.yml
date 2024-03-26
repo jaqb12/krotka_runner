@@ -64,4 +64,6 @@ jobs:
 
       
       - name: Run Ansible Ping Module
-        run: ansible localhost -m ping
+        run: ansible -i inventory.yml all -m ping
+      # - name: Run Ansible Ping Module
+      #   run: ansible localhost -m ping
