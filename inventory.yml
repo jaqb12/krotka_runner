@@ -2,6 +2,6 @@ ungrouped:
   hosts:
     192.168.1.202:
       ansible_user: jaqb
-      ansible_ssh_private_key_file: "{{ LSRV01_ID_RSA }}"
+      ansible_ssh_private_key_file: "{{ ssh_private_key }}"
       #ansible_user: piotr
       #ansible_password: $LSRV01PASSWD
