@@ -63,12 +63,14 @@ jobs:
 
       - name: Ansible version
         run: ansible --version
-      
+
       - name: Ansible inventory
-        run: ansible-inventory -i inventory.yml --list
+        run: |
+          cd ./ansible
+          ansible-inventory -i inventory.yml --list
 
       - name: Run Ansible Ping Module
         run: ansible -i inventory.yml all -m ping #--extra-vars "ssh_private_key='${{ env.LSRV01_ID_RSA }}'"
-      
+
       # - name: Run Ansible Ping Module
       #   run: ansible localhost -m ping
