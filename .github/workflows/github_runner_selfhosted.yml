@@ -50,6 +50,11 @@ jobs:
       - name: Install Ansible Dependencies
         run: pip install -r ./ansible/requirements.txt
 
+      - name: Ansible inventory
+        run: |
+          cd $ANSIBLE_PATH
+          ansible-inventory -i inventory.yml --list
+
       - name: Run ansible playbook for self-hosted runner(s)
         run: |
           cd $ANSIBLE_PATH
