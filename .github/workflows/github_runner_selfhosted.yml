@@ -50,4 +50,4 @@ jobs:
       - name: Run ansible playbook for self-hosted runner(s)
         run: |
           cd $ANSIBLE_PATH
-          ansible  all -m ping
+          ansible -i ./inventory/inventory.yml all -m ping
