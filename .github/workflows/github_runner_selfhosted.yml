@@ -24,6 +24,7 @@ jobs:
 
     env:
       ANSIBLE_PATH: './ansible'
+      LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
