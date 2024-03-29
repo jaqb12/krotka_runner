@@ -59,7 +59,12 @@ jobs:
           cd $ANSIBLE_PATH
           ansible-inventory -i ./inventory/inventory.yml --list
 
-      - name: Run ansible playbook for self-hosted runner(s)
+      - name: Run ansible module for self-hosted runner(s)
         run: |
           cd $ANSIBLE_PATH
           ansible -i ./inventory/inventory.yml runners -m ping $VERBOSITY
+
+      - name: Run ansible playbook for self-hosted runner(s)
+        run: |
+          cd $ANSIBLE_PATH
+          ansible-playbook  playbook.yaml -i ./inventory/inventory.yml runners $VERBOSITY
