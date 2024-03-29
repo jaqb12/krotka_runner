@@ -11,7 +11,7 @@ on:
   #  branches: [ "main" ]
   #schedule:
   #  - cron: '0 0 * * *'  # every day at midnight
-    
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -50,4 +50,4 @@ jobs:
       - name: Run ansible playbook for self-hosted runner(s)
         run: |
           cd $ANSIBLE_PATH
-          ansible -i inventory.yml all -m ping
+          ansible  all -m ping
