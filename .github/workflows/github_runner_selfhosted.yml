@@ -1,0 +1,53 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Github Runner Self-Hosted jobs
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  #push:
+    #branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
+  #schedule:
+  #  - cron: '0 0 * * *'  # every day at midnight
+    
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Check pip version
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pip sshpass -y
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10.12'
+
+      - name: Create virtual environment
+        run: python -m venv ansible_venv
+
+      - name: Activate virtual environment
+        run: |
+          source ansible_venv/bin/activate
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip
+
+      - name: Install Ansible Dependencies
+        run: pip install -r ./ansible/requirements.txt
+
+      - name: Run ansible playbook for self-hosted runner(s)
+        run: |
+          cd $ANSIBLE_PATH
+          ansible -i inventory.yml all -m ping
