@@ -73,7 +73,9 @@ jobs:
       - name: Run Ansible Ping Module
         run: |
           cd $ANSIBLE_PATH
-          ansible -i inventory.yml all -m ping #--extra-vars "ssh_private_key='${{ env.LSRV01_ID_RSA }}'"
+          ansible -i inventory.yml all -m ping
+
+        #ansible -i inventory.yml all -m ping #--extra-vars "ssh_private_key='${{ env.LSRV01_ID_RSA }}'"
 
       # - name: Run Ansible Ping Module
       #   run: ansible localhost -m ping
