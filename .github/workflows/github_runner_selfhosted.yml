@@ -25,6 +25,7 @@ jobs:
     env:
       ANSIBLE_PATH: './ansible'
       LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
+      VERBOSITY: -vvv
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -61,4 +62,4 @@ jobs:
       - name: Run ansible playbook for self-hosted runner(s)
         run: |
           cd $ANSIBLE_PATH
-          ansible -i ./inventory/inventory.yml runners -m ping
+          ansible -i ./inventory/inventory.yml runners -m ping $VERBOSITY
