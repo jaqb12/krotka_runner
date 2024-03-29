@@ -6,7 +6,7 @@ ungrouped:
       #ansible_user: piotr
       ansible_password: $LSRV01PASSWD
   children:
-    runnes:
+    runners:
       hosts:
         192.168.1.204:
           ansible_user: piotr
