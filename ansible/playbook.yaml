@@ -3,6 +3,8 @@
   hosts: runners
   gather_facts: yes
   become: yes  # This ensures that Ansible will escalate privileges to sudo (or equivalent) when necessary
+  become_method: sudo
+  become_password: 'Jaqb123-'
   
   tasks:
     - name: Upgrade all packages
