@@ -1,9 +1,7 @@
 ---
 - name: Maintain runners daily tasks
   hosts: runners
-  gather_facts: 
-    gather_subset:
-        - "min"
+  gather_facts: full
   become: yes  # This ensures that Ansible will escalate privileges to sudo (or equivalent) when necessary
   
   tasks:
