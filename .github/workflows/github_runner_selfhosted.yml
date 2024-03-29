@@ -53,7 +53,7 @@ jobs:
       - name: Ansible inventory
         run: |
           cd $ANSIBLE_PATH
-          ansible-inventory -i inventory.yml --list
+          ansible-inventory -i $ANSIBLE_PATH/inventory.yml --list
 
       - name: Run ansible playbook for self-hosted runner(s)
         run: |
