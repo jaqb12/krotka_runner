@@ -1,0 +1,46 @@
+---
+- name: Maintain runners daily tasks
+  hosts: runners
+  gather_facts: 
+    gather_subset:
+        - "min"
+  become: yes  # This ensures that Ansible will escalate privileges to sudo (or equivalent) when necessary
+  
+  tasks:
+    - name: Upgrade all packages
+      apt:
+        upgrade: safe
+        update_cache: yes
+        autoclean: true
+        autoremove: true
+      become: yes
+
+    - name: Reboot the host
+      reboot:
+        reboot_timeout: 300
+        pre_reboot_delay: 10
+      become: yes
+      async: 1
+      poll: 0
+      #register: reboot_result
+      ignore_errors: yes
+
+    # - name: Wait for host to come back online
+    #   wait_for_connection:
+    #     delay: 10
+    #     timeout: 300
+    #   become: yes
+    #   when: reboot_result.changed
+
+    # - name: Check if GitHub runner is working
+    #   shell: echo "GitHub runner is working"
+    #   register: github_runner_test
+    #   become: yes
+    #   ignore_errors: yes
+
+    # - name: Display GitHub runner test result
+    #   debug:
+    #     msg: "GitHub runner test result: {{ github_runner_test.stdout }}"
+    #   when: github_runner_test is defined and github_runner_test is success
+
+  
