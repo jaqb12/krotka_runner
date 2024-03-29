@@ -16,6 +16,7 @@ on:
 jobs:
   install_ansible:
     env:
+      ANSIBLE_PATH: './ansible'
       LSRV01_ID_RSA: ${{ secrets.LSRV01_ID_RSA }}
       LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
     runs-on: self-hosted
@@ -66,11 +67,13 @@ jobs:
 
       - name: Ansible inventory
         run: |
-          cd ./ansible
+          cd $ANSIBLE_PATH
           ansible-inventory -i inventory.yml --list
 
       - name: Run Ansible Ping Module
-        run: ansible -i inventory.yml all -m ping #--extra-vars "ssh_private_key='${{ env.LSRV01_ID_RSA }}'"
+        run: |
+          cd $ANSIBLE_PATH
+          ansible -i inventory.yml all -m ping #--extra-vars "ssh_private_key='${{ env.LSRV01_ID_RSA }}'"
 
       # - name: Run Ansible Ping Module
       #   run: ansible localhost -m ping
