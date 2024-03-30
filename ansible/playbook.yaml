@@ -18,6 +18,7 @@
       reboot:
         reboot_timeout: 300
         pre_reboot_delay: 10
+      continue-on-error: true
       become: yes
       async: 1
       poll: 0
