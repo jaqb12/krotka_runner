@@ -1,15 +1,16 @@
 ---
 - name: Maintain runners daily tasks
   hosts: runners
-  gather_facts: yes
-  #become: yes  # This ensures that Ansible will escalate privileges to sudo (or equivalent) when necessary
-  #become_method: sudo
+  become: yes  # Run tasks with sudo privileges
 
   tasks:
-    - name: Upgrade all packages
+    - name: Update package cache
       apt:
-        upgrade: safe
         update_cache: yes
-        autoclean: true
-        autoremove: true
-      become: yes
+      tags: update
+
+    - name: Upgrade packages
+      apt:
+        upgrade: yes
+        autoremove: yes
+      tags: update
