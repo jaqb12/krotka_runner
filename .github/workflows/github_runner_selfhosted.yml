@@ -73,7 +73,7 @@ jobs:
 
       - name: Run ansible playbook for self-hosted runner(s)
         run: |
-          cd $ANSIBLE_PATH
+          #cd $ANSIBLE_PATH
           ansible-playbook playbook2.yaml -i ./inventory/inventory.yml  $VERBOSITY
 
       - name: Restart host
