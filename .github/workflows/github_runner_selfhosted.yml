@@ -33,7 +33,7 @@ jobs:
         run: |
           echo Uptime:
           uptime
-          echo: ls -la
+          echo ls -la
           ls -la
           sudo apt-get update
           sudo apt-get install python3-pip sshpass -y
