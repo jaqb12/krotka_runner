@@ -34,14 +34,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check pip version
+      - name: Display infos
         run: |
+          echo "Verbosity level: $VERBOSITY"
           echo Uptime:
           uptime
           echo ls -la
           ls -la
-          #sudo apt-get update
-          #sudo apt-get install python3-pip sshpass -y
+          echo "Pass: $LSRV01PASSWD"
+
+      - name: Check pip version
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pip sshpass -y
 
         #ssh-keyscan -p 22 192.168.1.204 >> ~/.ssh/known_hosts
 
