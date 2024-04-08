@@ -24,6 +24,7 @@ jobs:
 
     env:
       ANSIBLE_PATH: './ansible'
+      ANSIBLE_VENV_NAME: 'ansible_venv'
       LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
       VERBOSITY: '-vvv'
 
@@ -46,14 +47,14 @@ jobs:
           python-version: '3.10.12'
 
       - name: Remove virtual environment
-        run: sudo rm -rf venv
+        run: sudo rm -rf $ANSIBLE_VENV_NAME
 
       - name: Create virtual environment
-        run: python -m venv ansible_venv
+        run: python -m venv $ANSIBLE_VENV_NAME
 
       - name: Activate virtual environment
         run: |
-          source ansible_venv/bin/activate
+          source $ANSIBLE_VENV_NAME/bin/activate
 
       - name: Upgrade pip
         run: pip install --upgrade pip
@@ -82,7 +83,7 @@ jobs:
           ansible-playbook playbook2.yaml -i ./inventory/inventory.yml  $VERBOSITY
 
       - name: Remove virtual environment
-        run: sudo rm -rf venv
+        run: sudo rm -rf $ANSIBLE_VENV_NAME
 
       - name: Restart host
         run: |
