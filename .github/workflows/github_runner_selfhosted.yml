@@ -66,6 +66,11 @@ jobs:
           cd $ANSIBLE_PATH
           ansible -i ./inventory/inventory.yml runners -m ping $VERBOSITY
 
+      - name: List files in ansible folder
+        run: |
+          cd $ANSIBLE_PATH
+          tree
+
       - name: Run ansible playbook for self-hosted runner(s)
         run: |
           cd $ANSIBLE_PATH
