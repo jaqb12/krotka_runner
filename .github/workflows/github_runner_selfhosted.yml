@@ -25,7 +25,7 @@ jobs:
     env:
       ANSIBLE_PATH: './ansible'
       ANSIBLE_VENV_NAME: 'ansible_venv'
-      #LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
+      LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
       VERBOSITY: '-vvv'
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -95,6 +95,6 @@ jobs:
       # - name: Remove virtual environment
       #   run: sudo rm -rf $ANSIBLE_VENV_NAME
 
-      # - name: Restart host
-      #   run: |
-      #     sudo shutdown -r +1 "System will reboot in 1 minutes"
+      - name: Restart host
+        run: |
+          sudo shutdown -r +1 "System will reboot in 1 minutes"
