@@ -1,7 +1,7 @@
 ---
 - name: Maintain runners daily tasks
   hosts: runners
-  become: yes  # Run tasks with sudo privileges
+  become: true  # Run tasks with sudo privileges
 
   tasks:
     - name: Update package cache
