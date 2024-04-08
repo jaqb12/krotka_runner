@@ -33,6 +33,8 @@ jobs:
         run: |
           echo Uptime:
           uptime
+          echo: ls -la
+          ls -la
           sudo apt-get update
           sudo apt-get install python3-pip sshpass -y
 
@@ -78,6 +80,9 @@ jobs:
         run: |
           cd $ANSIBLE_PATH
           ansible-playbook playbook2.yaml -i ./inventory/inventory.yml  $VERBOSITY
+
+      - name: Remove virtual environment
+        run: sudo rm -rf venv
 
       - name: Restart host
         run: |
