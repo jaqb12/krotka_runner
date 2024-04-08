@@ -23,7 +23,7 @@
       async: 1
       poll: 0
       #register: reboot_result
-      ignore_errors: yes
+      ignore_errors: true
 
     # - name: Wait for host to come back online
     #   wait_for_connection:
@@ -38,9 +38,9 @@
     #   become: yes
     #   ignore_errors: yes
 
-    # - name: Display GitHub runner test result
-    #   debug:
-    #     msg: "GitHub runner test result: {{ github_runner_test.stdout }}"
-    #   when: github_runner_test is defined and github_runner_test is success
+     - name: Display GitHub runner test result
+       debug:
+         msg: "GitHub runner test result: {{ github_runner_test.stdout }}"
+       when: github_runner_test is defined and github_runner_test is success
 
   
