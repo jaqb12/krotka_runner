@@ -1,16 +1,22 @@
+# ---
+# - name: Maintain runners daily tasks
+#   hosts: runners
+#   become: true  # Run tasks with sudo privileges
+
+#   tasks:
+#     - name: Update package cache
+#       apt:
+#         update_cache: yes
+#       tags: update
+
+#     - name: Upgrade packages
+#       apt:
+#         upgrade: yes
+#         autoremove: yes
+#       tags: update
 ---
-- name: Maintain runners daily tasks
-  hosts: runners
-  become: true  # Run tasks with sudo privileges
-
+- hosts: runners
   tasks:
-    - name: Update package cache
-      apt:
-        update_cache: yes
-      tags: update
-
-    - name: Upgrade packages
-      apt:
-        upgrade: yes
-        autoremove: yes
-      tags: update
+    - name: Print message
+      debug:
+        msg: Hello Ansible World
