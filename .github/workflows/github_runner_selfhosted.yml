@@ -61,7 +61,7 @@ jobs:
           cd $ANSIBLE_PATH
           ansible-inventory -i ./inventory/inventory.yml --list
 
-      - name: Run ansible module for self-hosted runner(s)
+      - name: Run ansible PING module for self-hosted runner(s)
         run: |
           cd $ANSIBLE_PATH
           ansible -i ./inventory/inventory.yml runners -m ping $VERBOSITY
