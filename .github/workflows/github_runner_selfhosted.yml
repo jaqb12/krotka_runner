@@ -70,3 +70,7 @@ jobs:
         run: |
           cd $ANSIBLE_PATH
           ansible-playbook  playbook.yaml -i ./inventory/inventory.yml  $VERBOSITY
+
+      - name: Restart host
+        run: |
+          sudo shutdown -r +1 "System will reboot in 1 minutes"
