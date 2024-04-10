@@ -30,11 +30,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job	
     steps:	
-      #synchronize files with repository	
+      # Synchronize files with repository	
       - name: Checkout	
         uses: actions/checkout@v4	
 
-      - name: Display infos	
+      - name: Display host informations	
         run: |	
           echo "Verbosity level: $VERBOSITY"	
           echo Uptime:	
@@ -42,6 +42,7 @@ jobs:
           echo ls -la	
           ls -la	
           echo "Pass: $LSRV01PASSWD"	
+
       - name: Check pip version	
         run: |	
           sudo apt-get update	
@@ -53,29 +54,29 @@ jobs:
         with:	
           python-version: '3.10.12'	
 
-      # - name: Remove virtual environment	
-      #   run: sudo rm -rf $ANSIBLE_VENV_NAME	
-
       - name: Create virtual environment	
         run: python -m venv $ANSIBLE_VENV_NAME	
 
       - name: Activate virtual environment	
         run: |	
           source $ANSIBLE_VENV_NAME/bin/activate	
+
       - name: Upgrade pip	
         run: pip install --upgrade pip	
 
       - name: Install Ansible Dependencies	
         run: pip install -r ./ansible/requirements.txt	
 
-      - name: Ansible inventory	
-        run: |	
-          cd $ANSIBLE_PATH	
-          ansible-inventory -i ./inventory/inventory.yml --list	
-      - name: Run ansible PING module for self-hosted runner(s)	
-        run: |	
-          cd $ANSIBLE_PATH	
-          ansible -i ./inventory/inventory.yml runners -m ping $VERBOSITY	
+      #- name: Display Ansible inventory	
+      #  run: |	
+      #    cd $ANSIBLE_PATH	
+      #    ansible-inventory -i ./inventory/inventory.yml --list	
+          
+      # - name: Run ansible PING module for self-hosted runner(s)	
+       # run: |	
+       #   cd $ANSIBLE_PATH	
+       #   ansible -i ./inventory/inventory.yml runners -m ping $VERBOSITY	
+          
       # - name: List files in ansible folder	
       #   run: |	
       #     #cd $ANSIBLE_PATH	
@@ -86,8 +87,9 @@ jobs:
         run: |	
           cd $ANSIBLE_PATH	
           ansible-playbook playbook.yaml -i ./inventory/inventory.yml  $VERBOSITY	
-      # - name: Remove virtual environment	
-      #   run: sudo rm -rf $ANSIBLE_VENV_NAME	
+      
+      - name: Remove virtual environment	
+        run: sudo rm -rf $ANSIBLE_VENV_NAME	
 
       - name: Restart host	
         run: |	
