@@ -102,6 +102,10 @@
     shell: |
       sudo docker image ls
 
+   - name: Gather Docker image facts
+      #docker_image_facts:
+      community.docker.docker_image_info 
+
   - name: Remove all Docker images
     docker_image:
       name: "{{ item }}"
