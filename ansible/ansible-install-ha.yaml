@@ -79,7 +79,7 @@
 
   - name: Install Docker
     apt:
-      name: {{ item  }}
+      name: "{{ item  }}"
       state: present
     loop:
       - docker-ce
@@ -90,4 +90,3 @@
 
   - name: List docker images
     docker_image_facts:
-    
