@@ -61,10 +61,10 @@ jobs:
       - name: Install Ansible Dependencies	
         run: pip install -r ./ansible/requirements.txt	
 
-      - name: Display Ansible inventory	
-        run: |	
-         cd $ANSIBLE_PATH	
-         ansible-inventory -i ./inventory/inventory.yml --list	
+      # - name: Display Ansible inventory	
+      #   run: |	
+      #    cd $ANSIBLE_PATH	
+      #    ansible-inventory -i ./inventory/inventory.yml --list	
           
       # - name: Run ansible PING module for homeassistant host(s)	
       #   run: |	
@@ -82,9 +82,5 @@ jobs:
           cd $ANSIBLE_PATH	
           ansible-playbook ansible-install-ha.yaml -i ./inventory/inventory.yml  $VERBOSITY	
       
-      # - name: Remove virtual environment	
-      #   run: sudo rm -rf $ANSIBLE_VENV_NAME	
-
-      # - name: Restart host
-      #   run: |	
-      #     sudo shutdown -r +1 "System will reboot in 1 minutes"	
+      - name: Remove virtual environment	
+        run: sudo rm -rf $ANSIBLE_VENV_NAME	

@@ -8,4 +8,5 @@ ungrouped:
     homeassistant:
       hosts:
         192.168.1.201:
+          ansible_user: piotr
           ansible_become_pass: "{{ lookup('env', 'LSRV01PASSWD') }}"
