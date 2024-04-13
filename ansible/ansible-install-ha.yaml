@@ -89,4 +89,5 @@
       - docker-compose-plugin
 
   - name: List docker images
-    docker_image_facts:
+    run: |
+      sudo docker image ls
