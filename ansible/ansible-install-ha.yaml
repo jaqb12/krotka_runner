@@ -13,36 +13,36 @@
       msg: "{{ shell_output.stdout }}"
 
   - name: Update apt package cache
-      apt:
-        update_cache: yes
+    apt:
+      update_cache: yes
 
     - name: Upgrade all packages
-      apt:
-        upgrade: yes
+    apt:
+      upgrade: yes
 
     - name: Load a kernel module
-      command: modprobe kvm
+    command: modprobe kvm
 
     - name: Add user to kvm group
-      user:
-        name: "{{ ansible_user }}"  # This will use the username of the user running Ansible
-        groups: kvm
-        append: yes
+    user:
+      name: "{{ ansible_user }}"  # This will use the username of the user running Ansible
+      groups: kvm
+      append: yes
 
     - name: Install GNOME Terminal package
-      apt:
-        name: gnome-terminal
-        state: present
+    apt:
+      name: gnome-terminal
+      state: present
 
     - name: Remove Docker packages
-      apt:
-        name: "{{ item }}"
-        state: absent
-      loop:
-        - docker.io
-        - docker-doc
-        - docker-compose
-        - docker-compose-v2
-        - podman-docker
-        - containerd
-        - runc
+    apt:
+      name: "{{ item }}"
+      state: absent
+    loop:
+      - docker.io
+      - docker-doc
+      - docker-compose
+      - docker-compose-v2
+      - podman-docker
+      - containerd
+      - runc
