@@ -5,7 +5,7 @@
 
   tasks:
   - name: Run shell command
-      shell: echo `hostname`
+      shell: 'hostname'
       register: shell_output
 
   - name: Print shell command output
