@@ -101,3 +101,13 @@
   - name: List docker images
     shell: |
       sudo docker image ls
+
+  - name: Remove all Docker images
+      docker_image:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ ansible_facts.docker_images }}"
+
+  - name: List docker images
+    shell: |
+      sudo docker image ls
