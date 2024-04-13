@@ -4,4 +4,6 @@
   become: true  # Run tasks with sudo privileges
 
   tasks:
-  - run: echo `hostname`
+  - name: Run a multi-line script
+    run: |
+      echo `hostname`
