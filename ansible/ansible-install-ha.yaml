@@ -89,5 +89,5 @@
       - docker-compose-plugin
 
   - name: List docker images
-    run: |
+    shell: |
       sudo docker image ls
