@@ -1,6 +1,6 @@
-# This is a basic workflow to help you get started with Actions	
+# This is a workflow for Home Assistant installation
 
-name: Github Runner Self-Hosted jobs	
+name: Github Runner - HomeAssistant install
 
 # Controls when the workflow will run	
 on:	
