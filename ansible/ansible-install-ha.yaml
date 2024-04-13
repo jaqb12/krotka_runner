@@ -4,6 +4,10 @@
   become: true  # Run tasks with sudo privileges
 
   tasks:
-  - name: Run a multi-line script
-    run: |
-      echo `hostname`
+  - name: Run shell command
+      shell: echo `hostname`
+      register: shell_output
+
+  - name: Print shell command output
+      debug:
+        msg: "{{ shell_output.stdout }}"
