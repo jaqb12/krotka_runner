@@ -68,12 +68,12 @@ jobs:
         run: pip install -r ./ansible/requirements.txt	
 
       - name: Display Ansible inventory	
-       run: |	
+        run: |	
          cd $ANSIBLE_PATH	
          ansible-inventory -i ./inventory/inventory.yml --list	
           
       - name: Run ansible PING module for homeassistant host(s)	
-       run: |	
+        run: |	
          cd $ANSIBLE_PATH	
          ansible -i ./inventory/inventory.yml homeassistant -m ping $VERBOSITY	
           
