@@ -4,10 +4,45 @@
   become: true  # Run tasks with sudo privileges
 
   tasks:
-  - name: 'Run shell command'
+  - name: 'CGet hostname'
     shell: 'hostname'
     register: shell_output
 
   - name: 'Print shell command output'
     debug:
       msg: "{{ shell_output.stdout }}"
+
+  - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+
+    - name: Load a kernel module
+      command: modprobe kvm
+
+    - name: Add user to kvm group
+      user:
+        name: "{{ ansible_user }}"  # This will use the username of the user running Ansible
+        groups: kvm
+        append: yes
+
+    - name: Install GNOME Terminal package
+      apt:
+        name: gnome-terminal
+        state: present
+
+    - name: Remove Docker packages
+      apt:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - docker.io
+        - docker-doc
+        - docker-compose
+        - docker-compose-v2
+        - podman-docker
+        - containerd
+        - runc
