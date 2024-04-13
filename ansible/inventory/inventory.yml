@@ -10,3 +10,7 @@ ungrouped:
         192.168.1.204:
           ansible_user: piotr
           ansible_password:  "{{ lookup('env', 'LSRV01PASSWD') }}"
+    homeassistant:
+      hosts:
+        192.168.1.201:
+          
