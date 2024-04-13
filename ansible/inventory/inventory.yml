@@ -1,9 +1,4 @@
 ungrouped:
-  hosts:
-    192.168.1.202:
-      ansible_user: jaqb
-      #ansible_ssh_private_key_file: "{{ ssh_private_key }}"
-      ansible_password: $LSRV01PASSWD
   children:
     runners:
       hosts:
@@ -13,4 +8,3 @@ ungrouped:
     homeassistant:
       hosts:
         192.168.1.201:
-          

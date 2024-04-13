@@ -1,0 +1,7 @@
+---
+- name: Instal HomeAssistance on Docker
+  hosts: runners
+  become: true  # Run tasks with sudo privileges
+
+  tasks:
+  - run: echo `hostname`
