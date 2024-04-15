@@ -104,13 +104,18 @@
 
   - name: Gather Docker image facts
     community.docker.docker_image_info:
+    register: image_facts
 
-  - name: Remove all Docker images
-    docker_image:
-      name: "{{ item }}"
-      state: absent
-    loop: "{{ ansible_facts.docker_images }}"
+  - name: Display Docker image facts
+    debug:
+      var: image_facts
 
-  - name: List docker images
-    shell: |
-      sudo docker image ls
+  # - name: Remove all Docker images
+  #   docker_image:
+  #     name: "{{ item }}"
+  #     state: absent
+  #   loop: "{{ ansible_facts.docker_images }}"
+
+  # - name: List docker images
+  #   shell: |
+  #     sudo docker image ls
