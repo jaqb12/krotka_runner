@@ -4,92 +4,92 @@
   become: true  # Run tasks with sudo privileges
 
   tasks:
-  - name: 'CGet hostname'
-    shell: 'hostname'
-    register: shell_output
+  # - name: 'Get hostname'
+  #   shell: 'hostname'
+  #   register: shell_output
 
-  - name: 'Print shell command output'
-    debug:
-      msg: "{{ shell_output.stdout }}"
+  # - name: 'Print shell command output'
+  #   debug:
+  #     msg: "{{ shell_output.stdout }}"
 
-  - name: Update apt package cache
-    apt:
-      update_cache: yes
+  # - name: Update apt package cache
+  #   apt:
+  #     update_cache: yes
 
-  - name: Upgrade all packages
-    apt:
-      upgrade: yes
+  # - name: Upgrade all packages
+  #   apt:
+  #     upgrade: yes
 
-  - name: Load a kernel module
-    command: modprobe kvm
+  # - name: Load a kernel module
+  #   command: modprobe kvm
 
-  - name: Add user to kvm group
-    user:
-      name: "{{ ansible_user }}"  # This will use the username of the user running Ansible
-      groups: kvm
-      append: yes
+  # - name: Add user to kvm group
+  #   user:
+  #     name: "{{ ansible_user }}"  # This will use the username of the user running Ansible
+  #     groups: kvm
+  #     append: yes
 
-  - name: Install GNOME Terminal package
-    apt:
-      name: gnome-terminal
-      state: present
+  # - name: Install GNOME Terminal package
+  #   apt:
+  #     name: gnome-terminal
+  #     state: present
 
-  - name: Remove Docker packages
-    apt:
-      name: "{{ item }}"
-      state: absent
-    loop:
-      - docker.io
-      - docker-doc
-      - docker-compose
-      - docker-compose-v2
-      - podman-docker
-      - containerd
-      - runc
+  # - name: Remove Docker packages
+  #   apt:
+  #     name: "{{ item }}"
+  #     state: absent
+  #   loop:
+  #     - docker.io
+  #     - docker-doc
+  #     - docker-compose
+  #     - docker-compose-v2
+  #     - podman-docker
+  #     - containerd
+  #     - runc
 
-  - name: Install ca-certificates and curl
-    apt:
-      name:
-        - ca-certificates
-        - curl
-      state: present
+  # - name: Install ca-certificates and curl
+  #   apt:
+  #     name:
+  #       - ca-certificates
+  #       - curl
+  #     state: present
 
-  - name: Create directory for apt keyrings
-    file:
-      path: /etc/apt/keyrings
-      state: directory
-      mode: '0755'
+  # - name: Create directory for apt keyrings
+  #   file:
+  #     path: /etc/apt/keyrings
+  #     state: directory
+  #     mode: '0755'
 
-  - name: Download Docker GPG key
-    get_url:
-      url: https://download.docker.com/linux/ubuntu/gpg
-      dest: /etc/apt/keyrings/docker.asc
+  # - name: Download Docker GPG key
+  #   get_url:
+  #     url: https://download.docker.com/linux/ubuntu/gpg
+  #     dest: /etc/apt/keyrings/docker.asc
 
-  - name: Change permissions of Docker GPG key
-    file:
-      path: /etc/apt/keyrings/docker.asc
-      mode: '0644'
+  # - name: Change permissions of Docker GPG key
+  #   file:
+  #     path: /etc/apt/keyrings/docker.asc
+  #     mode: '0644'
 
-  - name: Add Docker repository to Apt sources
-    lineinfile:
-      path: /etc/apt/sources.list.d/docker.list
-      line: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-      create: yes
+  # - name: Add Docker repository to Apt sources
+  #   lineinfile:
+  #     path: /etc/apt/sources.list.d/docker.list
+  #     line: "deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+  #     create: yes
 
-  - name: Update apt package cache
-    apt:
-      update_cache: yes
+  # - name: Update apt package cache
+  #   apt:
+  #     update_cache: yes
 
-  - name: Install Docker
-    apt:
-      name: "{{ item  }}"
-      state: present
-    loop:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-buildx-plugin
-      - docker-compose-plugin
+  # - name: Install Docker
+  #   apt:
+  #     name: "{{ item  }}"
+  #     state: present
+  #   loop:
+  #     - docker-ce
+  #     - docker-ce-cli
+  #     - containerd.io
+  #     - docker-buildx-plugin
+  #     - docker-compose-plugin
 
   - name: List docker images
     shell: |
@@ -99,16 +99,16 @@
     community.docker.docker_image_info:
     register: image_facts
 
-  - name: Display Docker image facts
+  - name: Display RepoTags of all images
     debug:
-      var: image_facts
-
-  - name: Stop all running containers
-    docker_container:
-      name: "{{ item }}"
-      state: stopped
-    loop: "{{ ansible_docker_container_ids }}"
-    when: item is defined
+      msg: "{{ item }}"
+    loop: "{{ image_facts.images.RepoTags }}"
+  # - name: Stop all running containers
+  #   docker_container:
+  #     name: "{{ item }}"
+  #     state: stopped
+  #   loop: "{{ ansible_docker_container_ids }}"
+  #   when: item is defined
 
   # - name: Remove all Docker images
   #   docker_image:
