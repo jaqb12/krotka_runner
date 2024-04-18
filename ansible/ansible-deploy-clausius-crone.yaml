@@ -1,0 +1,59 @@
+---
+- name: Build and Deploy Clausius Crone on Docker
+  hosts: homeassistant
+  become: true  # Run tasks with sudo privileges
+
+  vars:
+    dest_docker_path: /opt/my-clausius-crone
+    dockerfie: ./dockerfile/my-clausius-crone/Dockerfile
+    dockercomposefie: ./dockerfile/my-clausius-crone/compose.yaml
+    container_name: "my-clausius-crone"
+    container_tag: "v1"
+    compose_container_name: "my-clausius-crone-clausius-1"
+    scriptfile: ./dockerfile/my-clausius-crone/clausius_PS7.ps1
+
+  tasks:
+  - name: Update Ubuntu system
+    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-update.yaml"
+    when: ansible_distribution == 'Ubuntu'
+
+  - name: Install docker on Ubuntu
+    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-update.yaml"
+    when: ansible_distribution == 'Ubuntu'
+
+  - name: Copy docker files to destination
+    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-docker-clausius-copy-files.yaml"
+    when: ansible_distribution == 'Ubuntu'
+
+  - name: Remove container and image if source/configuration files changed
+    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-docker-clausius-remove-container_and_image.yaml"
+    when: script_changed.changed or docker_changed.changed or compose_changed.changed
+
+#=== Build image and compose up docker
+  - name: build the image
+    community.docker.docker_image:
+      name: "{{ container_name }}"
+      tag: "{{ container_tag }}"
+      build:
+        path: "{{ dest_docker_path }}"
+      source: build
+
+  - name: Create and start docker compose
+    community.docker.docker_compose_v2:
+      project_src: "{{ dest_docker_path }}"
+    register: output
+
+  #=== Docker container info ====
+  - name: Get infos on container
+    community.docker.docker_container_info:
+      name: "{{ compose_container_name }}"
+    register: result
+
+  - name: Does container exist?
+    ansible.builtin.debug:
+      msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
+
+  - name: Print information about container
+    ansible.builtin.debug:
+      var: result.container
+    when: result.exists
