@@ -1,0 +1,60 @@
+# This is a workflow for Home Assistant installation
+
+name: Github Runner - Clausius Docker deploy
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+
+    env:
+      ANSIBLE_PATH: './ansible'
+      ANSIBLE_VENV_NAME: 'ansible_venv'
+      LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
+      VERBOSITY: '-v'
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Synchronize files with repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check pip version
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pip sshpass -y
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10.12'
+
+      - name: Create virtual environment
+        run: python -m venv $ANSIBLE_VENV_NAME
+
+      - name: Activate virtual environment
+        run: |
+          source $ANSIBLE_VENV_NAME/bin/activate
+
+      - name: Upgrade pip
+        run: pip install --upgrade pip
+
+      - name: Install Ansible Dependencies
+        run: pip install -r ./ansible/requirements.txt
+
+      - name: Run ansible playbook for Clausius deployment (docker)
+        run: |
+          cd $ANSIBLE_PATH
+          ansible-playbook ansible-deploy-clausius-crone.yaml -i ./inventory/inventory.yml  $VERBOSITY
+
+      - name: Remove virtual environment
+        run: sudo rm -rf $ANSIBLE_VENV_NAME
