@@ -36,7 +36,7 @@ jobs:
       - name: Checkout Clausius PS scripts
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: main
           repository: jaqb12/Clausius
           path: myfakerepo
           #sparse-checkout: filename.ps1
