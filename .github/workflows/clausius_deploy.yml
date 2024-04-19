@@ -31,6 +31,8 @@ jobs:
       # Synchronize files with repository
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          path: main
 
       # test checkout other repo for script
       - name: Checkout Clausius PS scripts
@@ -38,6 +40,7 @@ jobs:
         with:
           repository: jaqb12/Clausius
           path: myfakerepo
+          #sparse-checkout: filename.ps1
 
       #list direcories
       - name: list folders/files
