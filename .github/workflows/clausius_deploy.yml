@@ -8,6 +8,9 @@ on:
   push:
     branches: [ "clausius-crone" ]
 
+  schedule:	
+  - cron: '10 0 * * *'  # every day at midnight	
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -29,33 +32,45 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check pip version
-        run: |
-          sudo apt-get update
-          sudo apt-get install python3-pip sshpass -y
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      # test checkout other repo for script
+      - name: Checkout Clausius PS scripts
+        uses: actions/checkout@v4
         with:
-          python-version: '3.10.12'
+          repository: jaqb12/Clausius
 
-      - name: Create virtual environment
-        run: python -m venv $ANSIBLE_VENV_NAME
-
-      - name: Activate virtual environment
+      #list direcories
+      - name: list folders/files
         run: |
-          source $ANSIBLE_VENV_NAME/bin/activate
+          ls
 
-      - name: Upgrade pip
-        run: pip install --upgrade pip
 
-      - name: Install Ansible Dependencies
-        run: pip install -r ./ansible/requirements.txt
+      # - name: Check pip version
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install python3-pip sshpass -y
 
-      - name: Run ansible playbook for Clausius deployment (docker)
-        run: |
-          cd $ANSIBLE_PATH
-          ansible-playbook ansible-deploy-clausius-crone.yaml -i ./inventory/inventory.yml  $VERBOSITY
+      # - name: Set up Python
+      #   uses: actions/setup-python@v2
+      #   with:
+      #     python-version: '3.10.12'
 
-      - name: Remove virtual environment
-        run: sudo rm -rf $ANSIBLE_VENV_NAME
+      # - name: Create virtual environment
+      #   run: python -m venv $ANSIBLE_VENV_NAME
+
+      # - name: Activate virtual environment
+      #   run: |
+      #     source $ANSIBLE_VENV_NAME/bin/activate
+
+      # - name: Upgrade pip
+      #   run: pip install --upgrade pip
+
+      # - name: Install Ansible Dependencies
+      #   run: pip install -r ./ansible/requirements.txt
+
+      # - name: Run ansible playbook for Clausius deployment (docker)
+      #   run: |
+      #     cd $ANSIBLE_PATH
+      #     ansible-playbook ansible-deploy-clausius-crone.yaml -i ./inventory/inventory.yml  $VERBOSITY
+
+      # - name: Remove virtual environment
+      #   run: sudo rm -rf $ANSIBLE_VENV_NAME
