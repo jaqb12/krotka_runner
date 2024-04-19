@@ -1,0 +1,26 @@
+
+  - name: Create Docker folder
+    ansible.builtin.file:
+      path: "{{ dest_docker_path }}"
+      state: directory
+
+  - name: Upload Docker file
+    ansible.builtin.copy:
+      src: "{{ dockerfie }}"
+      dest: "{{ dest_docker_path }}"
+      force: true
+    register: docker_changed
+
+  - name: Upload Docker Compose file
+    ansible.builtin.copy:
+      src: "{{ dockercomposefie }}"
+      dest: "{{ dest_docker_path }}"
+      force: true
+    register: compose_changed
+
+  - name: Upload PowerShell scrip file
+    ansible.builtin.copy:
+      src: "{{ scriptfile }}"
+      dest: "{{ dest_docker_path }}"
+      force: true
+    register: script_changed

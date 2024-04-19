@@ -1,0 +1,4 @@
+services:
+  clausius:
+    image: my-clausius-crone:v1
+    restart: always
