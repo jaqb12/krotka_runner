@@ -8,8 +8,8 @@ on:
   push:
     branches: [ "clausius-crone" ]
 
-  schedule:	
-  - cron: '10 0 * * *'  # every day at midnight	
+  schedule:
+  - cron: '10 0 * * *'  # every day at midnight
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -37,6 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: jaqb12/Clausius
+          path: myfakerepo
 
       #list direcories
       - name: list folders/files
