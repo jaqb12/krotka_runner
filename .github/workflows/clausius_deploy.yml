@@ -28,18 +28,29 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+
       # Synchronize files with repository
       - name: Checkout
         uses: actions/checkout@v4
 
-      # test checkout other repo for script
-      - name: Checkout Clausius PS scripts
-        uses: actions/checkout@v3
-        with:
-          #ref: master
-          repository: jaqb12/Clausius
-          path: myfakerepo
-          #sparse-checkout: filename.ps1
+      # # test checkout other repo for script
+      # - name: Checkout Clausius PS scripts
+      #   uses: actions/checkout@v3
+      #   with:
+      #     #ref: master
+      #     repository: jaqb12/Clausius
+      #     path: myfakerepo
+      #     #sparse-checkout: filename.ps1
+
+      # install git
+      - name: Install GNOME Terminal package
+        run: |
+          mkdir fake
+          git config user.name "Your Name"
+          git config user.email "your@email.com"
+          git clone https://github.com/jaqb12/Clausius
+
+      # run git commands
 
       #list direcories
       - name: list folders/files
