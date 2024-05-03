@@ -39,7 +39,7 @@ jobs:
         with:
           #ref: master
           repository: jaqb12/Clausius
-          #path: myfakerepo
+          path: Clausius
           token: ${{ secrets.GH_CLAUSIUS_TOKEN }}
           #sparse-checkout: filename.ps1
 
@@ -48,10 +48,7 @@ jobs:
         run: |
           pwd
           ls
-          cd ansible/dockerfile/my-clausius-crone
-          pwd
-          ls
-          
+
       - name: Copy script from Clausius to Docker
         run: cp Clausius/clausius_PS7.ps1 ansible/dockerfile/my-clausius-crone
 
