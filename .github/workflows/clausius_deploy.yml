@@ -39,9 +39,12 @@ jobs:
         with:
           #ref: master
           repository: jaqb12/Clausius
-          path: myfakerepo
+          #path: myfakerepo
           token: ${{ secrets.GH_CLAUSIUS_TOKEN }}
           #sparse-checkout: filename.ps1
+
+      - name: Copy script from Clausius to Docker
+        run: cp Clausius/clausius_PS7.ps1 ansible/dockerfile/my-clausius-crone
 
       # # install git
       # - name: Install GNOME Terminal package
@@ -57,6 +60,10 @@ jobs:
       #list direcories
       - name: list folders/files
         run: |
+          pwd
+          ls
+          cd ansible/dockerfile/my-clausius-crone
+          pwd
           ls
 
 
