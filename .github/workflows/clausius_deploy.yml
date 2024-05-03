@@ -43,19 +43,17 @@ jobs:
           token: ${{ secrets.GH_CLAUSIUS_TOKEN }}
           #sparse-checkout: filename.ps1
 
+      #list direcories
+      - name: list folders/files
+        run: |
+          pwd
+          ls
+          cd ansible/dockerfile/my-clausius-crone
+          pwd
+          ls
+          
       - name: Copy script from Clausius to Docker
         run: cp Clausius/clausius_PS7.ps1 ansible/dockerfile/my-clausius-crone
-
-      # # install git
-      # - name: Install GNOME Terminal package
-      #   run: |
-      #     mkdir fake
-      #     git config --global user.name "jaqb12"
-      #     git config --global user.email  "jaqb12@gmail.com"
-      #     git config --global url.https://github.com/.insteadOf git://github.com/
-      #     git clone https://github.com/jaqb12/Clausius
-
-      # run git commands
 
       #list direcories
       - name: list folders/files
