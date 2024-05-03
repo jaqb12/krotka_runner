@@ -8,6 +8,9 @@ on:
   push:
     branches: [ "clausius-crone" ]
 
+  schedule:
+  - cron: '10 0 * * *'  # every day at midnight
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -25,9 +28,23 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+
       # Synchronize files with repository
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Synchronize Clausius repo for script
+      - name: Checkout Clausius PS scripts
+        uses: actions/checkout@master
+        with:
+          #ref: master
+          repository: jaqb12/Clausius
+          path: Clausius
+          token: ${{ secrets.GH_CLAUSIUS_TOKEN }}
+          #sparse-checkout: filename.ps1
+
+      - name: Copy script from Clausius to Docker
+        run: cp Clausius/clausius_PS7.ps1 ansible/dockerfile/my-clausius-crone
 
       - name: Check pip version
         run: |
