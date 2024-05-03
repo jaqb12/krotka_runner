@@ -33,23 +33,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # # test checkout other repo for script
-      # - name: Checkout Clausius PS scripts
-      #   uses: actions/checkout@master
-      #   with:
-      #     #ref: master
-      #     repository: jaqb12/Clausius
-      #     path: myfakerepo
-      #     #sparse-checkout: filename.ps1
+      # test checkout other repo for script
+      - name: Checkout Clausius PS scripts
+        uses: actions/checkout@master
+        with:
+          #ref: master
+          repository: jaqb12/Clausius
+          path: myfakerepo
+          token: ${{ secrets.GH_CLAUSIUS_TOKEN }}
+          #sparse-checkout: filename.ps1
 
-      # install git
-      - name: Install GNOME Terminal package
-        run: |
-          mkdir fake
-          git config --global user.name "jaqb12"
-          git config --global user.email  "jaqb12@gmail.com"
-          git config --global url.https://github.com/.insteadOf git://github.com/
-          git clone https://github.com/jaqb12/Clausius
+      # # install git
+      # - name: Install GNOME Terminal package
+      #   run: |
+      #     mkdir fake
+      #     git config --global user.name "jaqb12"
+      #     git config --global user.email  "jaqb12@gmail.com"
+      #     git config --global url.https://github.com/.insteadOf git://github.com/
+      #     git clone https://github.com/jaqb12/Clausius
 
       # run git commands
 
