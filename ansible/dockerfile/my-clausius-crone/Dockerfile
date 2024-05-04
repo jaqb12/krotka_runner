@@ -9,7 +9,8 @@ ENV TZ=UTC
 RUN apt-get update && apt-get install -y cron
 
 # Create crone job
-RUN echo "*/2 * * * * /opt/microsoft/powershell/7/pwsh /mnt/clausius_PS7.ps1 >> /var/log/cron.log 2>&1" | crontab -
+#RUN echo "*/2 * * * * /opt/microsoft/powershell/7/pwsh /mnt/clausius_PS7.ps1 >> /var/log/cron.log 2>&1" | crontab -
+RUN echo "*/2 * * * * /opt/microsoft/powershell/7/pwsh /mnt/clausius_PS7.ps1 " | crontab -
 
 # Copy your script into the image
 COPY clausius_PS7.ps1 /mnt/clausius_PS7.ps1
