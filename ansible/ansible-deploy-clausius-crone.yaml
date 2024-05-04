@@ -1,6 +1,6 @@
 ---
 - name: Build and Deploy Clausius Crone on Docker
-  hosts: homeassistant
+  hosts: lsrv-01
   become: true  # Run tasks with sudo privileges
 
   vars:
