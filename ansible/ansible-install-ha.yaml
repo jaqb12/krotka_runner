@@ -4,7 +4,7 @@
   become: true  # Run tasks with sudo privileges
 
   tasks:
-  - name: 'CGet hostname'
+  - name: 'Get hostname'
     shell: 'hostname'
     register: shell_output
 

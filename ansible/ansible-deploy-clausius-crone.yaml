@@ -1,6 +1,6 @@
 ---
 - name: Build and Deploy Clausius Crone on Docker
-  hosts: homeassistant
+  hosts: lsrv-01
   become: true  # Run tasks with sudo privileges
 
   vars:
@@ -18,7 +18,7 @@
     when: ansible_distribution == 'Ubuntu'
 
   - name: Install docker on Ubuntu
-    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-update.yaml"
+    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-docker-install.yaml"
     when: ansible_distribution == 'Ubuntu'
 
   - name: Copy docker files to destination
