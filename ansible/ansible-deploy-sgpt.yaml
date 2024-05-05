@@ -26,7 +26,7 @@
 
   - name: Remove container and image if source/configuration files changed
     include_tasks: "{{ playbook_dir }}/jobs/ubuntu-docker-remove-container_and_image.yaml"
-    when: script_changed.changed or docker_changed.changed or compose_changed.changed
+    when: docker_changed.changed or compose_changed.changed
 
 #=== Build image and compose up docker
   - name: build the image
