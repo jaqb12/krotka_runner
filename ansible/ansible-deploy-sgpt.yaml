@@ -21,11 +21,11 @@
     when: ansible_distribution == 'Ubuntu'
 
   - name: Copy docker files to destination
-    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-docker-clausius-copy-files.yaml"
+    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-sgpt-copy-files.yaml"
     when: ansible_distribution == 'Ubuntu'
 
   - name: Remove container and image if source/configuration files changed
-    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-docker-clausius-remove-container_and_image.yaml"
+    include_tasks: "{{ playbook_dir }}/jobs/ubuntu-docker-remove-container_and_image.yaml"
     when: script_changed.changed or docker_changed.changed or compose_changed.changed
 
 #=== Build image and compose up docker
