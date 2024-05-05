@@ -25,7 +25,7 @@ jobs:
       ANSIBLE_VENV_NAME: 'ansible_venv'
       SGPT_API_TOKEN: ${{ secrets.SGPT_API_TOKEN }}
       LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
-      VERBOSITY: '-v'
+      VERBOSITY: '-vvv'
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
