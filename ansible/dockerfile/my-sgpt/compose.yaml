@@ -1,0 +1,4 @@
+services:
+  clausius:
+    image: my-sgpt:v1
+    restart: always
