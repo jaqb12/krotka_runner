@@ -9,7 +9,7 @@ RUN apt-get update && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y python3.10 python3-pip python3.12-venv && \
-    python -m venv sgpt 
+    python3 -m venv sgpt 
 RUN . /sgpt/bin/activate &&\
     pip3 install --upgrade pip && \
     pip3 install shell-gpt
