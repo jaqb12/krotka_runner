@@ -10,6 +10,7 @@
     container_name: "my-sgpt"
     container_tag: "v1"
     compose_container_name: "my-sgpt-1"
+    SGPT_API_TOKEN: ${{ secrets.SGPT_API_TOKEN }}
 
   tasks:
   - name: Update Ubuntu system
