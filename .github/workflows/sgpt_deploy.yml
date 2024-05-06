@@ -1,16 +1,15 @@
 # This is a workflow for Home Assistant installation
 
-name: Github Runner - HomeAssistant install
+name: Github Runner - Clausius Docker deploy
 
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  # push:
-  #   branches: [ "clausius-crone" ]
-  #pull_request:
-    #branches: [ "main" ]
-  #schedule:
-    # - cron: '0 0 * * *'  # every day at midnight
+  push:
+    branches: [ "sgpt" ]
+
+  schedule:
+  - cron: '20 0 * * *'  # every day at midnight
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,29 +23,21 @@ jobs:
     env:
       ANSIBLE_PATH: './ansible'
       ANSIBLE_VENV_NAME: 'ansible_venv'
+      SGPT_API_TOKEN: ${{ secrets.SGPT_API_TOKEN }}
       LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
-      VERBOSITY: '-v'
+      VERBOSITY: '-vvv'
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+
       # Synchronize files with repository
       - name: Checkout
         uses: actions/checkout@v4
-
-      # - name: Display host informations
-      #   run: |
-      #     echo "Verbosity level: $VERBOSITY"
-      #     echo Uptime:
-      #     uptime
-      #     echo ls -la
-      #     ls -la
-      #     echo "Pass: $LSRV01PASSWD"
 
       - name: Check pip version
         run: |
           sudo apt-get update
           sudo apt-get install python3-pip sshpass -y
-        #ssh-keyscan -p 22 192.168.1.204 >> ~/.ssh/known_hosts
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -66,26 +57,10 @@ jobs:
       - name: Install Ansible Dependencies
         run: pip install -r ./ansible/requirements.txt
 
-      # - name: Display Ansible inventory
-      #   run: |
-      #    cd $ANSIBLE_PATH
-      #    ansible-inventory -i ./inventory/inventory.yml --list
-
-      # - name: Run ansible PING module for homeassistant host(s)
-      #   run: |
-      #    cd $ANSIBLE_PATH
-      #    ansible -i ./inventory/inventory.yml homeassistant -m ping $VERBOSITY
-
-      # - name: List files in ansible folder
-      #   run: |
-      #     #cd $ANSIBLE_PATH
-      #     ls
-      #     #tree
-
-      - name: Run ansible playbook for HomeAssistant installation (docker)
+      - name: Run ansible playbook for Clausius deployment (docker)
         run: |
           cd $ANSIBLE_PATH
-          ansible-playbook ansible-install-ha.yaml -i ./inventory/inventory.yml  $VERBOSITY
+          ansible-playbook ansible-deploy-sgpt.yaml -i ./inventory/inventory.yml  $VERBOSITY
 
       - name: Remove virtual environment
         run: sudo rm -rf $ANSIBLE_VENV_NAME
