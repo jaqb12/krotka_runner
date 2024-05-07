@@ -24,7 +24,7 @@ jobs:
       ANSIBLE_PATH: './ansible'
       ANSIBLE_VENV_NAME: 'ansible_venv'
       SGPT_API_TOKEN: ${{ secrets.SGPT_API_TOKEN }}
-      LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
+      #LSRV01PASSWD: ${{ secrets.LSRV01_PASSWD }}
       VERBOSITY: '-vvv'
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -60,7 +60,10 @@ jobs:
       - name: Run ansible playbook for Clausius deployment (docker)
         run: |
           cd $ANSIBLE_PATH
-          ansible-playbook ansible-deploy-sgpt.yaml -i ./inventory/inventory.yml  $VERBOSITY
+          ansible-playbook ansible-deploy-sgpt.yaml \
+          -i ./inventory/inventory.yml \
+          -e "SGPT_API_TOKEN=$SGPT_API_TOKEN"
+          $VERBOSITY
 
       - name: Remove virtual environment
         run: sudo rm -rf $ANSIBLE_VENV_NAME
