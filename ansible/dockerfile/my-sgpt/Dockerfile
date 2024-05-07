@@ -4,17 +4,19 @@ FROM ubuntu:latest
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y python3.10 python3-pip
+# RUN apt-get update && \
+#     apt-get install -y software-properties-common && \
+#     add-apt-repository -y ppa:deadsnakes/ppa && \
+#     apt-get update && \
+#     apt-get install -y python3.10 python3-pip
 
-# RUN pip3 install --upgrade pip --break-system-packages && \
-#     pip3 install shell-gpt --break-system-packages
+# RUN pip3 install --upgrade pip --break-system-packages
+# RUN pip3 install shell-gpt --break-system-packages
 
 # Dodanie klucza API
-#ENV OPENAI_API_KEY=$SGPT_API_TOKEN
+ENV OPENAI_API_KEY=$SGPT_API_TOKEN
+ENV OPENAI_API_KEY2="${{ SGPT_API_TOKEN }}""
+
 #ENV OPENAI_API_KEY=${{ secrets.SGPT_API_TOKEN }}
 
 CMD /bin/bash

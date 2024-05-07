@@ -36,8 +36,6 @@
       tag: "{{ container_tag }}"
       build:
         path: "{{ dest_docker_path }}"
-        args:
-          OPENAI_API_KEY: "{{ SGPT_API_TOKEN }}"
       source: build
 
   - name: Create and start docker compose
