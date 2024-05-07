@@ -38,22 +38,22 @@
         path: "{{ dest_docker_path }}"
       source: build
 
-  - name: Create and start docker compose
-    community.docker.docker_compose_v2:
-      project_src: "{{ dest_docker_path }}"
-    register: output
+  # - name: Create and start docker compose
+  #   community.docker.docker_compose_v2:
+  #     project_src: "{{ dest_docker_path }}"
+  #   register: output
 
-  #=== Docker container info ====
-  - name: Get infos on container
-    community.docker.docker_container_info:
-      name: "{{ compose_container_name }}"
-    register: result
+  # #=== Docker container info ====
+  # - name: Get infos on container
+  #   community.docker.docker_container_info:
+  #     name: "{{ compose_container_name }}"
+  #   register: result
 
-  - name: Does container exist?
-    ansible.builtin.debug:
-      msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
+  # - name: Does container exist?
+  #   ansible.builtin.debug:
+  #     msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
 
-  - name: Print information about container
-    ansible.builtin.debug:
-      var: result.container
-    when: result.exists
+  # - name: Print information about container
+  #   ansible.builtin.debug:
+  #     var: result.container
+  #   when: result.exists

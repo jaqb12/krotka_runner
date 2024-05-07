@@ -23,8 +23,4 @@ ENV OPENAI_API_KEY=$SGPT_API_TOKEN
 #CMD [". /sgpt/bin/activate", "sgpt"]
 # ENTRYPOINT ["tail", "-f", "/dev/null"]
 
-# Create the log file to be able to run tail
-RUN touch /var/log/foo.log
-
-# Run the command on container startup
-CMD tail -f /var/log/foo.log
+CMD ["/bin/bash"]

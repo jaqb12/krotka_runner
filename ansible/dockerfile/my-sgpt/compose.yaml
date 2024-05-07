@@ -1,4 +1,4 @@
 services:
-  clausius:
+  sgpt:
     image: my-sgpt:v1
     restart: always
