@@ -30,8 +30,9 @@
     when: docker_changed.changed or compose_changed.changed
 
 #=== Build image and compose up docker
+
   - name: Build and push Docker image
-    uses: docker/build-push-action@v3
+    uses: docker/build-push-action@v5
     with:
       file: ./dockerfile/my-sgpt/Dockerfile
       context: .
@@ -39,6 +40,7 @@
       tags: sgpt:v2
       build-args: |
         OPENAI_API_KEY=${{ secrets.SGPT_API_TOKEN }}
+
   # - name: build the image
   #   community.docker.docker_image:
   #     name: "{{ container_name }}"

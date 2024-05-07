@@ -57,7 +57,7 @@ jobs:
       - name: Install Ansible Dependencies
         run: pip install -r ./ansible/requirements.txt
 
-      - name: Run ansible playbook for Clausius deployment (docker)
+      - name: Run ansible playbook for SGPT image build (docker)
         run: |
           cd $ANSIBLE_PATH
           ansible-playbook ansible-deploy-sgpt.yaml \
