@@ -8,16 +8,14 @@ RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt-get install -y python3.10 python3-pip python3.12-venv && \
-    python3 -m venv sgpt 
-RUN . /sgpt/bin/activate &&\
-    pip3 install --upgrade pip && \
-    pip3 install shell-gpt
+    apt-get install -y python3.10 python3-pip && \
+    pip3 install --upgrade pip --break-system-packages && \
+    pip3 install shell-gpt --break-system-packages
 
 # Dodanie klucza API
 ENV OPENAI_API_KEY=$SGPT_API_TOKEN
 #ENV OPENAI_API_KEY=${{ secrets.SGPT_API_TOKEN }}
 
-# Uruchomienie SGPT Chat
-CMD [". /sgpt/bin/activate", "sgpt"]
+CMD ["/bin/bash"]
+#CMD [". /sgpt/bin/activate", "sgpt"]
 # ENTRYPOINT ["tail", "-f", "/dev/null"]
