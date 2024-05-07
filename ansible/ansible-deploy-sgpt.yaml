@@ -13,8 +13,9 @@
     #SGPT_API_TOKEN: ${{ secrets.SGPT_API_TOKEN }}
 
   tasks:
-  - ansible.builtin.debug:
-    msg: "{{ SGPT_API_TOKEN }}"
+  - name: Show me a token?
+    ansible.builtin.debug:
+      msg: "{{ SGPT_API_TOKEN }}"
 
   - name: Update Ubuntu system
     include_tasks: "{{ playbook_dir }}/jobs/ubuntu-update.yaml"

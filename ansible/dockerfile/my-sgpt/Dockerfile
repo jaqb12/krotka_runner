@@ -16,6 +16,6 @@ RUN apt-get update && \
 ENV OPENAI_API_KEY=$SGPT_API_TOKEN
 #ENV OPENAI_API_KEY=${{ secrets.SGPT_API_TOKEN }}
 
-CMD ["/bin/bash"]
+CMD /bin/bash
 #CMD [". /sgpt/bin/activate", "sgpt"]
 # ENTRYPOINT ["tail", "-f", "/dev/null"]
