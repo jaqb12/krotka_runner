@@ -13,7 +13,7 @@ RUN apt-get update && \
     pip3 install shell-gpt --break-system-packages
 
 # Dodanie klucza API
-ENV OPENAI_API_KEY=$SGPT_API_TOKEN
+#ENV OPENAI_API_KEY=$SGPT_API_TOKEN
 #ENV OPENAI_API_KEY=${{ secrets.SGPT_API_TOKEN }}
 
 CMD /bin/bash
