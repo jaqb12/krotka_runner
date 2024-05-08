@@ -1,6 +1,6 @@
 ---
 - name: Build and Deploy SGPT AI chat on Docker
-  hosts: lsrv-01
+  hosts: virt-group-01
   become: true  # Run tasks with sudo privileges
 
   vars:
@@ -31,31 +31,13 @@
 
 #=== Build image and compose up docker
 
-  - name: Set up QEMU
-    uses: docker/setup-qemu-action@v3
-
-  - name: Set up Docker Buildx
-    uses: docker/setup-buildx-action@v3
-    with:
-      driver-opts: network=host
-
-  - name: Build and push Docker image
-    uses: docker/build-push-action@v5
-    with:
-      file: ./dockerfile/my-sgpt/Dockerfile
-      context: .
-      push: true
-      tags: sgpt:v2
-      build-args: |
-        OPENAI_API_KEY=${{ secrets.SGPT_API_TOKEN }}
-
-  # - name: build the image
-  #   community.docker.docker_image:
-  #     name: "{{ container_name }}"
-  #     tag: "{{ container_tag }}"
-  #     build:
-  #       path: "{{ dest_docker_path }}"
-  #     source: build
+  - name: build the image
+    community.docker.docker_image:
+      name: "{{ container_name }}"
+      tag: "{{ container_tag }}"
+      build:
+        path: "{{ dest_docker_path }}"
+      source: build
 
   # - name: Create and start docker compose
   #   community.docker.docker_compose_v2:
