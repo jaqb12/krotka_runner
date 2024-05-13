@@ -17,3 +17,9 @@
       dest: "{{ dest_docker_path }}"
       force: true
     register: compose_changed
+
+  # Create a file with OPENAI API KEY
+  - name: Creating a file with content
+    copy:
+      content: "{{ SGPT_API_TOKEN }}"
+      dest: "{{ dest_docker_path }}/openia_api_key"
