@@ -22,4 +22,6 @@
   - name: Creating a file with content
     copy:
       content: "{{ SGPT_API_TOKEN }}"
-      dest: "{{ dest_docker_path }}/openia_api_key"
+      dest: "{{ dest_docker_path }}/key.sgpt"
+      force: true
+    register: api_changed
