@@ -1,6 +1,6 @@
 # This is a workflow for Home Assistant installation
 
-name: Github Runner - Clausius Docker deploy
+name: Github Runner - SGPT Docker deploy
 
 # Controls when the workflow will run
 on:
