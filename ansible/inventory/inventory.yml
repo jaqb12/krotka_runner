@@ -1,11 +1,11 @@
-ungrouped:
+all:
   children:
     runners:
       hosts:
         192.168.1.204:
           ansible_user: piotr
-          ansible_password:  "{{ lookup('env', 'LSRV01PASSWD') }}"
-    lsrv-01:
+          ansible_ssh_private_key_file: ~/.ssh/runner_key
+    lsrv_01:
       hosts:
         192.168.1.201:
           ansible_user: piotr

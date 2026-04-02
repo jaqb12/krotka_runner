@@ -1,0 +1,20 @@
+name: Runner Nightly Reboot
+
+on:
+  schedule:
+    - cron: '0 3 * * *'    # 3:00 AM UTC (1 hour after maintenance)
+  workflow_dispatch:
+
+jobs:
+  reboot:
+    name: Nightly Reboot
+    runs-on: self-hosted
+
+    steps:
+      - name: Pre-reboot info
+        run: |
+          echo "Scheduled reboot at $(date -u)"
+          uptime
+
+      - name: Schedule reboot
+        run: sudo shutdown -r +1 "Scheduled nightly maintenance reboot"

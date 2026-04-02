@@ -1,0 +1,56 @@
+- name: Get disk usage percentage on /
+  shell: df / | awk 'NR==2 {print $5}' | tr -d '%'
+  register: disk_pct
+  changed_when: false
+  tags: health
+
+- name: Fail if disk usage exceeds threshold
+  fail:
+    msg: >
+      ALERT: Disk usage on / is {{ disk_pct.stdout }}%,
+      exceeding threshold of {{ disk_threshold }}%.
+      Run: sudo journalctl --vacuum-size=500M && sudo apt-get autoremove
+  when: disk_pct.stdout | int > disk_threshold | int
+  tags: health
+
+- name: Get memory usage percentage
+  shell: free | awk '/^Mem/ {printf "%.0f", ($3/$2)*100}'
+  register: mem_pct
+  changed_when: false
+  tags: health
+
+- name: Warn if memory usage exceeds threshold
+  debug:
+    msg: >
+      WARNING: Memory usage is {{ mem_pct.stdout }}%,
+      exceeding threshold of {{ mem_threshold }}%.
+  when: mem_pct.stdout | int > mem_threshold | int
+  tags: health
+
+- name: Get load average (1 min)
+  shell: cat /proc/loadavg | awk '{print $1}'
+  register: load_avg
+  changed_when: false
+  tags: health
+
+- name: Get CPU count
+  command: nproc
+  register: cpu_count
+  changed_when: false
+  tags: health
+
+- name: Warn if load average is high
+  debug:
+    msg: >
+      WARNING: Load average ({{ load_avg.stdout }}) is high
+      relative to CPU count ({{ cpu_count.stdout }}).
+  when: load_avg.stdout | float > (cpu_count.stdout | int * 2)
+  tags: health
+
+- name: Print system health summary
+  debug:
+    msg:
+      - "Disk /: {{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
+      - "Memory: {{ mem_pct.stdout }}% used (threshold: {{ mem_threshold }}%)"
+      - "Load avg (1m): {{ load_avg.stdout }} / {{ cpu_count.stdout }} CPUs"
+  tags: health

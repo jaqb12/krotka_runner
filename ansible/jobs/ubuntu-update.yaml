@@ -1,8 +1,23 @@
-
 - name: Update apt package cache
   apt:
     update_cache: yes
+    cache_valid_time: 3600
+  tags: update
 
 - name: Upgrade all packages
   apt:
-    upgrade: yes
+    upgrade: safe
+  async: 600
+  poll: 30
+  tags: update
+
+- name: Remove unused packages
+  apt:
+    autoremove: yes
+    purge: yes
+  tags: update
+
+- name: Clean apt cache
+  apt:
+    autoclean: yes
+  tags: update
