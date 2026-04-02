@@ -134,7 +134,7 @@
     body_format: json
     body:
       embeds:
-        - title: ":whale: lsrv-01 Docker Maintenance Complete ({{ ansible_hostname }})"
+        - title: ":whale: lsrv-01 Docker Maintenance Complete ({{ ansible_facts['hostname'] }})"
           color: 3066993
           fields:
             - name: "Containers stopped (pre-reboot)"
@@ -150,7 +150,7 @@
               value: "{{ docker_df_after.stdout_lines | join(' | ') | truncate(200) }}"
               inline: false
           footer:
-            text: "lsrv-01 maintenance — {{ ansible_date_time.date }}"
+            text: "lsrv-01 maintenance — {{ ansible_facts['date_time']['date'] }}"
     status_code: 204
   when: lookup('env', 'DISCORD_WEBHOOK_URL') != ''
   tags: docker

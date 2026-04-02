@@ -37,11 +37,11 @@
     body_format: json
     body:
       embeds:
-        - title: ":test_tube: Health Check — TEST ({{ ansible_hostname }})"
+        - title: ":test_tube: Health Check — TEST ({{ ansible_facts['hostname'] }})"
           color: 3447003
           fields:
             - name: "Host"
-              value: "{{ ansible_hostname }} ({{ inventory_hostname }})"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
               inline: false
             - name: "Disk /"
               value: "{{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
@@ -65,11 +65,11 @@
     body_format: json
     body:
       embeds:
-        - title: ":warning: Warning — High Memory ({{ ansible_hostname }})"
+        - title: ":warning: Warning — High Memory ({{ ansible_facts['hostname'] }})"
           color: 16776960
           fields:
             - name: "Host"
-              value: "{{ ansible_hostname }} ({{ inventory_hostname }})"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
               inline: false
             - name: "Memory usage"
               value: "{{ mem_pct.stdout }}% (threshold: {{ mem_threshold }}%)"
@@ -93,11 +93,11 @@
     body_format: json
     body:
       embeds:
-        - title: ":warning: Warning — High Load ({{ ansible_hostname }})"
+        - title: ":warning: Warning — High Load ({{ ansible_facts['hostname'] }})"
           color: 16776960
           fields:
             - name: "Host"
-              value: "{{ ansible_hostname }} ({{ inventory_hostname }})"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
               inline: false
             - name: "Load avg (1m)"
               value: "{{ load_avg.stdout }} (CPUs: {{ cpu_count.stdout }})"
@@ -122,11 +122,11 @@
     body:
       content: "<@406028093296476171>"
       embeds:
-        - title: ":red_circle: ALERT — Disk Critical ({{ ansible_hostname }})"
+        - title: ":red_circle: ALERT — Disk Critical ({{ ansible_facts['hostname'] }})"
           color: 15158332
           fields:
             - name: "Host"
-              value: "{{ ansible_hostname }} ({{ inventory_hostname }})"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
               inline: false
             - name: "Disk /"
               value: "{{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
