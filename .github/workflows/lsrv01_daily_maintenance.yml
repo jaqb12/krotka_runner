@@ -1,0 +1,82 @@
+name: lsrv-01 Daily Maintenance
+
+on:
+  schedule:
+    - cron: '0 4 * * *'    # 4:00 AM UTC daily (after runner maintenance at 2 AM and reboot at 3 AM)
+  workflow_dispatch:
+    inputs:
+      verbosity:
+        description: 'Ansible verbosity flag (e.g. -v, -vv, or leave blank)'
+        required: false
+        default: ''
+      tags:
+        description: 'Ansible tags to run (e.g. update,hardening,docker — blank=all)'
+        required: false
+        default: ''
+      send_test_notification:
+        description: 'Send test Discord notification with current resource usage (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  maintenance:
+    name: lsrv-01 Daily Maintenance
+    runs-on: self-hosted
+
+    env:
+      ANSIBLE_PATH: './ansible'
+      ANSIBLE_VENV_NAME: 'ansible_venv'
+      DISK_THRESHOLD: ${{ vars.DISK_THRESHOLD || '85' }}
+      MEM_THRESHOLD: ${{ vars.MEM_THRESHOLD || '90' }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      SEND_TEST_NOTIFICATION: ${{ inputs.send_test_notification || 'false' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Display host info
+        run: |
+          echo "Runner: $(hostname)"
+          uptime
+          df -h /
+
+      - name: Write SSH private key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RUNNER_SSH_PRIVATE_KEY }}" > ~/.ssh/runner_key
+          chmod 600 ~/.ssh/runner_key
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y python3-pip
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible in venv
+        run: |
+          python -m venv $ANSIBLE_VENV_NAME
+          source $ANSIBLE_VENV_NAME/bin/activate
+          pip install --upgrade pip
+          pip install -r ./ansible/requirements.txt
+
+      - name: Run Ansible playbook
+        run: |
+          source $ANSIBLE_VENV_NAME/bin/activate
+          cd $ANSIBLE_PATH
+          TAGS_ARG=""
+          if [ -n "${{ inputs.tags }}" ]; then
+            TAGS_ARG="--tags ${{ inputs.tags }}"
+          fi
+          ansible-playbook playbook-lsrv01.yaml \
+            -i ./inventory/inventory.yml \
+            ${{ inputs.verbosity || '' }} \
+            $TAGS_ARG
+
+      - name: Remove SSH key and venv
+        if: always()
+        run: |
+          rm -f ~/.ssh/runner_key
+          sudo rm -rf $ANSIBLE_VENV_NAME
