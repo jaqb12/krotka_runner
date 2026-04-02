@@ -32,9 +32,9 @@
 
 # --- B: Graceful stop all running containers ---
 
-- name: Get list of running container IDs
+- name: Get list of running container IDs (to restore after reboot)
   command: docker ps -q
-  register: running_containers
+  register: running_container_ids
   changed_when: false
   tags: docker
 
@@ -45,8 +45,8 @@
   tags: docker
 
 - name: Stop all running containers gracefully (30s timeout)
-  command: docker stop --time 30 {{ running_containers.stdout_lines | join(' ') }}
-  when: running_containers.stdout_lines | length > 0
+  command: docker stop --time 30 {{ running_container_ids.stdout_lines | join(' ') }}
+  when: running_container_ids.stdout_lines | length > 0
   tags: docker
 
 - name: Confirm all containers stopped
@@ -57,7 +57,7 @@
 
 - name: Print stop summary
   debug:
-    msg: "Stopped {{ running_containers.stdout_lines | length }} container(s). Still running: {{ still_running.stdout | default('none') }}"
+    msg: "Stopped {{ running_container_ids.stdout_lines | length }} container(s). Still running: {{ still_running.stdout | default('none') }}"
   tags: docker
 
 # --- C: Reboot host and wait for it to come back ---
@@ -74,24 +74,11 @@
     msg: "lsrv-01 is back online after reboot"
   tags: docker
 
-# --- D: Start containers back up ---
+# --- D: Start exactly the containers that were running before reboot ---
 
-- name: Find all compose.yaml files under /opt
-  find:
-    paths: /opt
-    patterns: "compose.yaml"
-    recurse: yes
-  register: compose_files
-  tags: docker
-
-- name: Start Docker Compose projects
-  community.docker.docker_compose_v2:
-    project_src: "{{ item.path | dirname }}"
-    state: present
-  loop: "{{ compose_files.files }}"
-  loop_control:
-    label: "{{ item.path | dirname }}"
-  when: compose_files.files | length > 0
+- name: Start previously running containers
+  command: docker start {{ running_container_ids.stdout_lines | join(' ') }}
+  when: running_container_ids.stdout_lines | length > 0
   tags: docker
 
 - name: Get running containers after reboot
@@ -147,11 +134,11 @@
     body_format: json
     body:
       embeds:
-        - title: ":whale: lsrv-01 Docker Maintenance Complete"
+        - title: ":whale: lsrv-01 Docker Maintenance Complete ({{ ansible_facts['hostname'] }})"
           color: 3066993
           fields:
             - name: "Containers stopped (pre-reboot)"
-              value: "{{ running_container_names.stdout_lines | join(', ') | default('none') }} ({{ running_containers.stdout_lines | length }} total)"
+              value: "{{ running_container_names.stdout_lines | join(', ') | default('none') }} ({{ running_container_ids.stdout_lines | length }} total)"
               inline: false
             - name: "Containers running (post-reboot)"
               value: "{{ running_after_reboot.stdout_lines | join(', ') | default('none') }}"
@@ -163,7 +150,7 @@
               value: "{{ docker_df_after.stdout_lines | join(' | ') | truncate(200) }}"
               inline: false
           footer:
-            text: "lsrv-01 maintenance — {{ ansible_date_time.date }}"
+            text: "lsrv-01 maintenance — {{ ansible_facts['date_time']['date'] }}"
     status_code: 204
   when: lookup('env', 'DISCORD_WEBHOOK_URL') != ''
   tags: docker

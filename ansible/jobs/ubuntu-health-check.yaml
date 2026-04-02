@@ -37,9 +37,12 @@
     body_format: json
     body:
       embeds:
-        - title: ":test_tube: Runner Health Check — TEST"
+        - title: ":test_tube: Health Check — TEST ({{ ansible_facts['hostname'] }})"
           color: 3447003
           fields:
+            - name: "Host"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
+              inline: false
             - name: "Disk /"
               value: "{{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
               inline: true
@@ -62,9 +65,12 @@
     body_format: json
     body:
       embeds:
-        - title: ":warning: Runner Warning — High Memory"
+        - title: ":warning: Warning — High Memory ({{ ansible_facts['hostname'] }})"
           color: 16776960
           fields:
+            - name: "Host"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
+              inline: false
             - name: "Memory usage"
               value: "{{ mem_pct.stdout }}% (threshold: {{ mem_threshold }}%)"
               inline: true
@@ -87,9 +93,12 @@
     body_format: json
     body:
       embeds:
-        - title: ":warning: Runner Warning — High Load"
+        - title: ":warning: Warning — High Load ({{ ansible_facts['hostname'] }})"
           color: 16776960
           fields:
+            - name: "Host"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
+              inline: false
             - name: "Load avg (1m)"
               value: "{{ load_avg.stdout }} (CPUs: {{ cpu_count.stdout }})"
               inline: true
@@ -113,9 +122,12 @@
     body:
       content: "<@406028093296476171>"
       embeds:
-        - title: ":red_circle: Runner ALERT — Disk Critical"
+        - title: ":red_circle: ALERT — Disk Critical ({{ ansible_facts['hostname'] }})"
           color: 15158332
           fields:
+            - name: "Host"
+              value: "{{ ansible_facts['hostname'] }} ({{ inventory_hostname }})"
+              inline: false
             - name: "Disk /"
               value: "{{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
               inline: true
