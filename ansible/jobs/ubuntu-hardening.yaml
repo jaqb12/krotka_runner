@@ -56,6 +56,13 @@
 
 # --- SSH Hardening ---
 
+- name: Ensure /run/sshd exists for sshd config validation
+  file:
+    path: /run/sshd
+    state: directory
+    mode: '0755'
+  tags: hardening
+
 - name: Harden SSH configuration
   lineinfile:
     path: /etc/ssh/sshd_config
