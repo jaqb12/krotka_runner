@@ -7,6 +7,8 @@
 - name: Upgrade all packages
   apt:
     upgrade: safe
+  async: 600
+  poll: 30
   tags: update
 
 - name: Remove unused packages
