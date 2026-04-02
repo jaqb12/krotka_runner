@@ -1,0 +1,169 @@
+# --- A: Pre-reboot Docker info ---
+
+- name: Get Docker host info (containers, images, volumes)
+  community.docker.docker_host_info:
+    containers: true
+    images: true
+    volumes: true
+    disk_usage: true
+  register: docker_info
+  tags: docker
+
+- name: Print Docker summary before reboot
+  debug:
+    msg:
+      - "=== Docker Status (pre-reboot) ==="
+      - "Running containers: {{ docker_info.containers | selectattr('State', 'equalto', 'running') | map(attribute='Names') | map('first') | list | join(', ') | default('none') }}"
+      - "Total containers: {{ docker_info.containers | length }}"
+      - "Total images: {{ docker_info.images | length }}"
+      - "Volumes: {{ docker_info.volumes | length }}"
+  tags: docker
+
+- name: Get disk usage before cleanup
+  command: docker system df --format "{{ '{{' }}.Type{{ '}}' }}\t{{ '{{' }}.Size{{ '}}' }}\t{{ '{{' }}.Reclaimable{{ '}}' }}"
+  register: docker_df_before
+  changed_when: false
+  tags: docker
+
+- name: Print disk usage before cleanup
+  debug:
+    msg: "{{ docker_df_before.stdout_lines }}"
+  tags: docker
+
+# --- B: Graceful stop all running containers ---
+
+- name: Get list of running container IDs
+  command: docker ps -q
+  register: running_containers
+  changed_when: false
+  tags: docker
+
+- name: Get list of running container names (for Discord report)
+  command: docker ps --format "{{ '{{' }}.Names{{ '}}' }}"
+  register: running_container_names
+  changed_when: false
+  tags: docker
+
+- name: Stop all running containers gracefully (30s timeout)
+  command: docker stop --time 30 {{ running_containers.stdout_lines | join(' ') }}
+  when: running_containers.stdout_lines | length > 0
+  tags: docker
+
+- name: Confirm all containers stopped
+  command: docker ps -q
+  register: still_running
+  changed_when: false
+  tags: docker
+
+- name: Print stop summary
+  debug:
+    msg: "Stopped {{ running_containers.stdout_lines | length }} container(s). Still running: {{ still_running.stdout | default('none') }}"
+  tags: docker
+
+# --- C: Reboot host and wait for it to come back ---
+
+- name: Reboot lsrv-01 and wait for it to return
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+    connect_timeout: 10
+    test_command: uptime
+  tags: docker
+
+- name: Verify host is back online
+  debug:
+    msg: "lsrv-01 is back online after reboot"
+  tags: docker
+
+# --- D: Start containers back up ---
+
+- name: Find all compose.yaml files under /opt
+  find:
+    paths: /opt
+    patterns: "compose.yaml"
+    recurse: yes
+  register: compose_files
+  tags: docker
+
+- name: Start Docker Compose projects
+  community.docker.docker_compose_v2:
+    project_src: "{{ item.path | dirname }}"
+    state: present
+  loop: "{{ compose_files.files }}"
+  loop_control:
+    label: "{{ item.path | dirname }}"
+  when: compose_files.files | length > 0
+  tags: docker
+
+- name: Get running containers after reboot
+  command: docker ps --format "{{ '{{' }}.Names{{ '}}' }}"
+  register: running_after_reboot
+  changed_when: false
+  tags: docker
+
+- name: Print post-reboot container status
+  debug:
+    msg:
+      - "=== Docker Status (post-reboot) ==="
+      - "Running containers: {{ running_after_reboot.stdout_lines | join(', ') | default('none') }}"
+  tags: docker
+
+# --- E: Docker cleanup (prune) ---
+
+- name: Prune dangling images
+  command: docker image prune -f
+  register: image_prune
+  changed_when: "'deleted' in image_prune.stdout"
+  tags: docker
+
+- name: Prune stopped containers
+  command: docker container prune -f
+  register: container_prune
+  changed_when: "'deleted' in container_prune.stdout"
+  tags: docker
+
+- name: Prune unused anonymous volumes
+  command: docker volume prune -f
+  register: volume_prune
+  changed_when: "'deleted' in volume_prune.stdout"
+  tags: docker
+
+- name: Get disk usage after cleanup
+  command: docker system df --format "{{ '{{' }}.Type{{ '}}' }}\t{{ '{{' }}.Size{{ '}}' }}\t{{ '{{' }}.Reclaimable{{ '}}' }}"
+  register: docker_df_after
+  changed_when: false
+  tags: docker
+
+- name: Print disk usage after cleanup
+  debug:
+    msg: "{{ docker_df_after.stdout_lines }}"
+  tags: docker
+
+# --- F: Discord summary notification ---
+
+- name: Send Discord summary — Docker maintenance complete
+  uri:
+    url: "{{ lookup('env', 'DISCORD_WEBHOOK_URL') }}"
+    method: POST
+    body_format: json
+    body:
+      embeds:
+        - title: ":whale: lsrv-01 Docker Maintenance Complete"
+          color: 3066993
+          fields:
+            - name: "Containers stopped (pre-reboot)"
+              value: "{{ running_container_names.stdout_lines | join(', ') | default('none') }} ({{ running_containers.stdout_lines | length }} total)"
+              inline: false
+            - name: "Containers running (post-reboot)"
+              value: "{{ running_after_reboot.stdout_lines | join(', ') | default('none') }}"
+              inline: false
+            - name: "Images pruned"
+              value: "{{ image_prune.stdout | default('none') | truncate(100) }}"
+              inline: false
+            - name: "Disk usage after cleanup"
+              value: "{{ docker_df_after.stdout_lines | join(' | ') | truncate(200) }}"
+              inline: false
+          footer:
+            text: "lsrv-01 maintenance — {{ ansible_date_time.date }}"
+    status_code: 204
+  when: lookup('env', 'DISCORD_WEBHOOK_URL') != ''
+  tags: docker

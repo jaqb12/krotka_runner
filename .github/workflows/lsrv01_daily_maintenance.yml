@@ -1,8 +1,8 @@
-name: Runner Daily Maintenance
+name: lsrv-01 Daily Maintenance
 
 on:
   schedule:
-    - cron: '0 2 * * *'    # 2:00 AM UTC daily
+    - cron: '0 4 * * *'    # 4:00 AM UTC daily (after runner maintenance at 2 AM and reboot at 3 AM)
   workflow_dispatch:
     inputs:
       verbosity:
@@ -10,7 +10,7 @@ on:
         required: false
         default: ''
       tags:
-        description: 'Ansible tags to run (e.g. update,hardening — blank=all)'
+        description: 'Ansible tags to run (e.g. update,hardening,docker — blank=all)'
         required: false
         default: ''
       send_test_notification:
@@ -20,7 +20,7 @@ on:
 
 jobs:
   maintenance:
-    name: Daily Maintenance
+    name: lsrv-01 Daily Maintenance
     runs-on: self-hosted
 
     env:
@@ -70,7 +70,7 @@ jobs:
           if [ -n "${{ inputs.tags }}" ]; then
             TAGS_ARG="--tags ${{ inputs.tags }}"
           fi
-          ansible-playbook playbook.yaml \
+          ansible-playbook playbook-lsrv01.yaml \
             -i ./inventory/inventory.yml \
             ${{ inputs.verbosity || '' }} \
             $TAGS_ARG

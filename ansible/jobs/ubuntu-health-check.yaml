@@ -4,27 +4,10 @@
   changed_when: false
   tags: health
 
-- name: Fail if disk usage exceeds threshold
-  fail:
-    msg: >
-      ALERT: Disk usage on / is {{ disk_pct.stdout }}%,
-      exceeding threshold of {{ disk_threshold }}%.
-      Run: sudo journalctl --vacuum-size=500M && sudo apt-get autoremove
-  when: disk_pct.stdout | int > disk_threshold | int
-  tags: health
-
 - name: Get memory usage percentage
   shell: free | awk '/^Mem/ {printf "%.0f", ($3/$2)*100}'
   register: mem_pct
   changed_when: false
-  tags: health
-
-- name: Warn if memory usage exceeds threshold
-  debug:
-    msg: >
-      WARNING: Memory usage is {{ mem_pct.stdout }}%,
-      exceeding threshold of {{ mem_threshold }}%.
-  when: mem_pct.stdout | int > mem_threshold | int
   tags: health
 
 - name: Get load average (1 min)
@@ -39,18 +22,138 @@
   changed_when: false
   tags: health
 
-- name: Warn if load average is high
-  debug:
-    msg: >
-      WARNING: Load average ({{ load_avg.stdout }}) is high
-      relative to CPU count ({{ cpu_count.stdout }}).
-  when: load_avg.stdout | float > (cpu_count.stdout | int * 2)
-  tags: health
-
 - name: Print system health summary
   debug:
     msg:
       - "Disk /: {{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
       - "Memory: {{ mem_pct.stdout }}% used (threshold: {{ mem_threshold }}%)"
       - "Load avg (1m): {{ load_avg.stdout }} / {{ cpu_count.stdout }} CPUs"
+  tags: health
+
+- name: Send Discord TEST notification
+  uri:
+    url: "{{ lookup('env', 'DISCORD_WEBHOOK_URL') }}"
+    method: POST
+    body_format: json
+    body:
+      embeds:
+        - title: ":test_tube: Runner Health Check — TEST"
+          color: 3447003
+          fields:
+            - name: "Disk /"
+              value: "{{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
+              inline: true
+            - name: "Memory"
+              value: "{{ mem_pct.stdout }}% used (threshold: {{ mem_threshold }}%)"
+              inline: true
+            - name: "Load avg (1m)"
+              value: "{{ load_avg.stdout }} / {{ cpu_count.stdout }} CPUs"
+              inline: true
+          footer:
+            text: "Triggered manually via workflow_dispatch"
+    status_code: 204
+  when: lookup('env', 'DISCORD_WEBHOOK_URL') != '' and lookup('env', 'SEND_TEST_NOTIFICATION') == 'true'
+  tags: health
+
+- name: Send Discord WARNING — memory high
+  uri:
+    url: "{{ lookup('env', 'DISCORD_WEBHOOK_URL') }}"
+    method: POST
+    body_format: json
+    body:
+      embeds:
+        - title: ":warning: Runner Warning — High Memory"
+          color: 16776960
+          fields:
+            - name: "Memory usage"
+              value: "{{ mem_pct.stdout }}% (threshold: {{ mem_threshold }}%)"
+              inline: true
+            - name: "Disk /"
+              value: "{{ disk_pct.stdout }}% used"
+              inline: true
+            - name: "Load avg (1m)"
+              value: "{{ load_avg.stdout }} / {{ cpu_count.stdout }} CPUs"
+              inline: true
+    status_code: 204
+  when: >
+    lookup('env', 'DISCORD_WEBHOOK_URL') != '' and
+    mem_pct.stdout | int > mem_threshold | int
+  tags: health
+
+- name: Send Discord WARNING — load high
+  uri:
+    url: "{{ lookup('env', 'DISCORD_WEBHOOK_URL') }}"
+    method: POST
+    body_format: json
+    body:
+      embeds:
+        - title: ":warning: Runner Warning — High Load"
+          color: 16776960
+          fields:
+            - name: "Load avg (1m)"
+              value: "{{ load_avg.stdout }} (CPUs: {{ cpu_count.stdout }})"
+              inline: true
+            - name: "Disk /"
+              value: "{{ disk_pct.stdout }}% used"
+              inline: true
+            - name: "Memory"
+              value: "{{ mem_pct.stdout }}% used"
+              inline: true
+    status_code: 204
+  when: >
+    lookup('env', 'DISCORD_WEBHOOK_URL') != '' and
+    load_avg.stdout | float > (cpu_count.stdout | int * 2)
+  tags: health
+
+- name: Send Discord ALERT — disk critical
+  uri:
+    url: "{{ lookup('env', 'DISCORD_WEBHOOK_URL') }}"
+    method: POST
+    body_format: json
+    body:
+      content: "<@406028093296476171>"
+      embeds:
+        - title: ":red_circle: Runner ALERT — Disk Critical"
+          color: 15158332
+          fields:
+            - name: "Disk /"
+              value: "{{ disk_pct.stdout }}% used (threshold: {{ disk_threshold }}%)"
+              inline: true
+            - name: "Memory"
+              value: "{{ mem_pct.stdout }}% used"
+              inline: true
+            - name: "Load avg (1m)"
+              value: "{{ load_avg.stdout }} / {{ cpu_count.stdout }} CPUs"
+              inline: true
+          footer:
+            text: "Maintenance workflow will now FAIL"
+    status_code: 204
+  when: >
+    lookup('env', 'DISCORD_WEBHOOK_URL') != '' and
+    disk_pct.stdout | int > disk_threshold | int
+  tags: health
+
+- name: Fail if disk usage exceeds threshold
+  fail:
+    msg: >
+      ALERT: Disk usage on / is {{ disk_pct.stdout }}%,
+      exceeding threshold of {{ disk_threshold }}%.
+      Run: sudo journalctl --vacuum-size=500M && sudo apt-get autoremove
+  when: disk_pct.stdout | int > disk_threshold | int
+  tags: health
+
+- name: Warn if memory usage exceeds threshold
+  debug:
+    msg: >
+      WARNING: Memory usage is {{ mem_pct.stdout }}%,
+      exceeding threshold of {{ mem_threshold }}%.
+  when: mem_pct.stdout | int > mem_threshold | int
+  tags: health
+
+- name: Warn if load average is high
+  debug:
+    msg: >
+      WARNING: Load average ({{ load_avg.stdout }}) is high
+      relative to CPU count ({{ cpu_count.stdout }}).
+  when: load_avg.stdout | float > (cpu_count.stdout | int * 2)
   tags: health

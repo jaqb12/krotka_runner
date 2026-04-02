@@ -9,5 +9,4 @@ all:
       hosts:
         192.168.1.201:
           ansible_user: piotr
-          ansible_become_pass: "{{ lookup('env', 'LSRV01PASSWD') }}"
-          ansible_password: "{{ lookup('env', 'LSRV01PASSWD') }}"
+          ansible_ssh_private_key_file: ~/.ssh/runner_key

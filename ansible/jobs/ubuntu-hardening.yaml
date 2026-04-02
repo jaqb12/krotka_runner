@@ -30,6 +30,30 @@
     state: enabled
   tags: hardening
 
+- name: Allow HTTP (port 80) — lsrv-01 only
+  ufw:
+    rule: allow
+    port: '80'
+    proto: tcp
+  when: inventory_hostname in groups['lsrv_01']
+  tags: hardening
+
+- name: Allow HTTPS (port 443) — lsrv-01 only
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+  when: inventory_hostname in groups['lsrv_01']
+  tags: hardening
+
+- name: Allow ports 8000-8100 for Docker apps — lsrv-01 only
+  ufw:
+    rule: allow
+    port: '8000:8100'
+    proto: tcp
+  when: inventory_hostname in groups['lsrv_01']
+  tags: hardening
+
 # --- SSH Hardening ---
 
 - name: Harden SSH configuration
