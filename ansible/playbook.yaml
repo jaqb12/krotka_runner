@@ -1,16 +1,31 @@
 ---
-- name: Maintain runners daily tasks
+- name: Daily Runner Maintenance and Hardening
   hosts: runners
-  become: true  # Run tasks with sudo privileges
+  become: true
+
+  vars:
+    disk_threshold: "{{ lookup('env', 'DISK_THRESHOLD') | default('85', true) }}"
+    mem_threshold: "{{ lookup('env', 'MEM_THRESHOLD') | default('90', true) }}"
+
+  handlers:
+    - name: Restart sshd
+      service:
+        name: ssh
+        state: restarted
 
   tasks:
-    - name: Update package cache
-      apt:
-        update_cache: yes
+    - name: Health checks
+      include_tasks: "{{ playbook_dir }}/jobs/ubuntu-health-check.yaml"
+      tags: always
+
+    - name: Package updates
+      include_tasks: "{{ playbook_dir }}/jobs/ubuntu-update.yaml"
       tags: update
 
-    - name: Upgrade packages
-      apt:
-        upgrade: yes
-        autoremove: yes
-      tags: update
+    - name: Security hardening
+      include_tasks: "{{ playbook_dir }}/jobs/ubuntu-hardening.yaml"
+      tags: hardening
+
+    - name: Log cleanup
+      include_tasks: "{{ playbook_dir }}/jobs/ubuntu-log-cleanup.yaml"
+      tags: cleanup

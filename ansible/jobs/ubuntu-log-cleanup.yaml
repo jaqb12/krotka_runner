@@ -1,0 +1,33 @@
+- name: Vacuum systemd journal (keep last 7 days)
+  command: journalctl --vacuum-time=7d
+  changed_when: false
+  tags: cleanup
+
+- name: Vacuum systemd journal by size (max 500MB)
+  command: journalctl --vacuum-size=500M
+  changed_when: false
+  tags: cleanup
+
+- name: Find old compressed log files (older than 30 days)
+  find:
+    paths: /var/log
+    patterns: "*.gz,*.1,*.2,*.3,*.4"
+    age: 30d
+    recurse: yes
+  register: old_logs
+  tags: cleanup
+
+- name: Delete old log files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ old_logs.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: old_logs.files | length > 0
+  tags: cleanup
+
+- name: Report log cleanup results
+  debug:
+    msg: "Removed {{ old_logs.files | length }} old log file(s)"
+  tags: cleanup
