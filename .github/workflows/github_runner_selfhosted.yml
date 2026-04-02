@@ -13,6 +13,10 @@ on:
         description: 'Ansible tags to run (e.g. update,hardening — blank=all)'
         required: false
         default: ''
+      send_test_notification:
+        description: 'Send test Discord notification with current resource usage (true/false)'
+        required: false
+        default: 'false'
 
 jobs:
   maintenance:
@@ -24,6 +28,8 @@ jobs:
       ANSIBLE_VENV_NAME: 'ansible_venv'
       DISK_THRESHOLD: ${{ vars.DISK_THRESHOLD || '85' }}
       MEM_THRESHOLD: ${{ vars.MEM_THRESHOLD || '90' }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      SEND_TEST_NOTIFICATION: ${{ inputs.send_test_notification || 'false' }}
 
     steps:
       - name: Checkout
