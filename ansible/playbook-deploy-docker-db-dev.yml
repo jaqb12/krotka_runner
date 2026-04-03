@@ -45,6 +45,12 @@
       register: prune_result
       changed_when: "'deleted' in prune_result.stdout"
 
+    - name: Remove orphan msp_db_dev_net network if not managed by compose
+      command: docker network rm msp_db_dev_net
+      register: net_remove
+      failed_when: net_remove.rc != 0 and 'No such network' not in net_remove.stderr
+      changed_when: net_remove.rc == 0
+
     - name: Build and start docker-compose stack
       command: docker compose -f "{{ deploy_dir }}/{{ compose_file }}" up -d --build
       environment:
