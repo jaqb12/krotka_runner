@@ -1,4 +1,4 @@
-name: Deploy Docker DB Dev
+name: Deploy MSP Docker DB Dev
 
 # Deploys the MSP_enginering docker-db-dev stack to lsrv-01 via Ansible.
 # Workflow clones MSP_enginering (docker-db-dev branch), checks for existing
