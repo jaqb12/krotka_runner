@@ -20,6 +20,21 @@
       loop:
         - "{{ deploy_dir }}/docker"
 
+    - name: Sync app source to lsrv-01
+      synchronize:
+        src: "{{ msp_source_path }}/"
+        dest: "{{ deploy_dir }}/"
+        delete: true
+        recursive: true
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=__pycache__"
+          - "--exclude=*.pyc"
+          - "--exclude=.venv"
+          - "--exclude=node_modules"
+          - "--exclude=.env"
+          - "--exclude=docker/.env.tunnel.dev"
+
     - name: Write .env to lsrv-01
       copy:
         content: "{{ lookup('env', 'MSP_APP_ENV') }}"
@@ -35,19 +50,6 @@
         mode: '0600'
         owner: root
         group: root
-
-    - name: Sync app source to lsrv-01
-      synchronize:
-        src: "{{ msp_source_path }}/"
-        dest: "{{ deploy_dir }}/"
-        delete: true
-        recursive: true
-        rsync_opts:
-          - "--exclude=.git"
-          - "--exclude=__pycache__"
-          - "--exclude=*.pyc"
-          - "--exclude=.venv"
-          - "--exclude=node_modules"
 
     - name: Get running containers with prefix
       command: docker ps -q -f "name={{ container_prefix }}"
