@@ -66,7 +66,7 @@ jobs:
           cd $ANSIBLE_PATH
           ansible-playbook playbook-deploy-docker-db-dev.yml \
             -i ./inventory/inventory.yml \
-            -e "msp_source_path={{ playbook_dir }}/../../msp_engineering" \
+            -e "msp_source_path=$GITHUB_WORKSPACE/msp_engineering" \
             ${{ inputs.verbosity || '' }}
         env:
           MSP_DB_PASSWORD_DEV: ${{ secrets.MSP_DB_PASSWORD_DEV }}
