@@ -45,20 +45,12 @@
       register: prune_result
       changed_when: "'deleted' in prune_result.stdout"
 
-    - name: Create msp_db_dev_net network if not exists
-      command: docker network inspect msp_db_dev_net
-      register: network_check
-      ignore_errors: yes
-      changed_when: false
-
-    - name: Create docker network
-      command: docker network create msp_db_dev_net
-      when: network_check.rc != 0
-
     - name: Build and start docker-compose stack
       command: docker compose -f "{{ deploy_dir }}/{{ compose_file }}" up -d --build
       environment:
         MSP_DB_PASSWORD_DEV: "{{ lookup('env', 'MSP_DB_PASSWORD_DEV') }}"
+      async: 600
+      poll: 15
       register: compose_result
 
     - name: Wait for services to be ready
