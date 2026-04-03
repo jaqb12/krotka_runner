@@ -43,6 +43,12 @@
         owner: root
         group: root
 
+    - name: Assert MSP_CF_TUNNEL_TOKEN_DEV is set
+      assert:
+        that:
+          - lookup('env', 'MSP_CF_TUNNEL_TOKEN_DEV') | length > 0
+        fail_msg: "MSP_CF_TUNNEL_TOKEN_DEV is empty or not set"
+
     - name: Write .env.tunnel.dev to lsrv-01
       copy:
         content: "{{ lookup('env', 'MSP_CF_TUNNEL_TOKEN_DEV') }}"
@@ -83,6 +89,7 @@
         up -d --build
       environment:
         MSP_DB_PASSWORD_DEV: "{{ lookup('env', 'MSP_DB_PASSWORD_DEV') }}"
+        TUNNEL_TOKEN: "{{ lookup('env', 'MSP_CF_TUNNEL_TOKEN_DEV') | regex_replace('^TUNNEL_TOKEN=', '') }}"
       async: 600
       poll: 15
       register: compose_result
