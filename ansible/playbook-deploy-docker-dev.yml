@@ -1,0 +1,100 @@
+---
+- name: Deploy Docker Dev app stack to lsrv-01
+  hosts: lsrv_01
+  become: true
+
+  vars:
+    msp_source_path: "{{ playbook_dir }}/../../msp_engineering"
+    deploy_dir: /opt/msp
+    compose_file_base: docker/docker-compose.yml
+    compose_file_dev: docker/docker-compose.dev.yml
+    compose_project: msp-dev
+    container_prefix: msp-dev
+
+  tasks:
+    - name: Create deploy directories on lsrv-01
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ deploy_dir }}/docker"
+
+    - name: Write .env to lsrv-01
+      copy:
+        content: "{{ lookup('env', 'MSP_APP_ENV') }}"
+        dest: "{{ deploy_dir }}/.env"
+        mode: '0600'
+        owner: root
+        group: root
+
+    - name: Write .env.tunnel.dev to lsrv-01
+      copy:
+        content: "{{ lookup('env', 'MSP_CF_TUNNEL_TOKEN_DEV') }}"
+        dest: "{{ deploy_dir }}/docker/.env.tunnel.dev"
+        mode: '0600'
+        owner: root
+        group: root
+
+    - name: Copy docker-compose.yml to lsrv-01
+      copy:
+        src: "{{ msp_source_path }}/docker/docker-compose.yml"
+        dest: "{{ deploy_dir }}/docker/docker-compose.yml"
+        mode: '0644'
+
+    - name: Copy docker-compose.dev.yml to lsrv-01
+      copy:
+        src: "{{ msp_source_path }}/docker/docker-compose.dev.yml"
+        dest: "{{ deploy_dir }}/docker/docker-compose.dev.yml"
+        mode: '0644'
+
+    - name: Get running containers with prefix
+      command: docker ps -q -f "name={{ container_prefix }}"
+      register: running_containers
+      changed_when: false
+
+    - name: Get all containers (running + stopped) with prefix
+      command: docker ps -a -q -f "name={{ container_prefix }}"
+      register: all_containers
+      changed_when: false
+
+    - name: Stop running containers
+      command: docker stop --time 30 {{ running_containers.stdout_lines | join(' ') }}
+      when: running_containers.stdout_lines | length > 0
+
+    - name: Remove all containers with prefix
+      command: docker rm -f {{ all_containers.stdout_lines | join(' ') }}
+      when: all_containers.stdout_lines | length > 0
+
+    - name: Remove dangling images
+      command: docker image prune -f
+      register: prune_result
+      changed_when: "'deleted' in prune_result.stdout"
+
+    - name: Build and start docker-compose dev stack
+      command: >
+        docker compose
+        -p {{ compose_project }}
+        -f "{{ deploy_dir }}/{{ compose_file_base }}"
+        -f "{{ deploy_dir }}/{{ compose_file_dev }}"
+        up -d --build
+      environment:
+        MSP_DB_PASSWORD_DEV: "{{ lookup('env', 'MSP_DB_PASSWORD_DEV') }}"
+      async: 600
+      poll: 15
+      register: compose_result
+
+    - name: Wait for services to be ready
+      pause:
+        seconds: 15
+
+    - name: Print running containers
+      command: docker ps --filter "name={{ container_prefix }}" --format "table {% raw %}{{.Names}}\t{{.Status}}{% endraw %}"
+      register: running_status
+      changed_when: false
+
+    - name: Show deployment result
+      debug:
+        msg:
+          - "=== Docker Dev deployed ==="
+          - "{{ running_status.stdout_lines }}"

@@ -1,0 +1,93 @@
+name: Deploy Docker Dev
+
+# Deploys the MSP_enginering app dev stack to lsrv-01 via Ansible.
+# Triggered manually or automatically when MSP_enginering development branch is updated
+# (via repository_dispatch from MSP_enginering notify-krotka-deploy-dev workflow).
+#
+# Requires msp_db_dev_net network to exist (created by deploy-docker-db-dev workflow).
+# Public URL after deploy: https://msp-dev.jaqb.uk (via Cloudflare Tunnel)
+
+on:
+  workflow_dispatch:
+    inputs:
+      verbosity:
+        description: 'Ansible verbosity level'
+        required: false
+        default: '-v'
+        type: choice
+        options:
+          - none
+          - -v
+          - -vvv
+  repository_dispatch:
+    types:
+      - deploy-dev
+
+jobs:
+  deploy-docker-dev:
+    name: Deploy Docker Dev to lsrv-01
+    runs-on: self-hosted
+
+    env:
+      ANSIBLE_PATH: './ansible'
+      ANSIBLE_VENV_NAME: 'ansible_venv'
+
+    steps:
+      - name: Checkout krotka_runner
+        uses: actions/checkout@v4
+
+      - name: Clone MSP_enginering development branch
+        uses: actions/checkout@v4
+        with:
+          repository: jaqb12/MSP_enginering
+          ref: development
+          path: msp_engineering
+          token: ${{ secrets.MSP_ENGINEERING_REPO }}
+
+      - name: Display host info
+        run: |
+          echo "Runner: $(hostname)"
+          uptime
+          df -h /
+
+      - name: Write SSH private key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RUNNER_SSH_PRIVATE_KEY }}" > ~/.ssh/runner_key
+          chmod 600 ~/.ssh/runner_key
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y python3-pip rsync
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible in venv
+        run: |
+          python -m venv $ANSIBLE_VENV_NAME
+          source $ANSIBLE_VENV_NAME/bin/activate
+          pip install --upgrade pip
+          pip install -r ./ansible/requirements.txt
+
+      - name: Run Ansible playbook
+        run: |
+          source $ANSIBLE_VENV_NAME/bin/activate
+          cd $ANSIBLE_PATH
+          VERBOSITY="${{ inputs.verbosity }}"
+          [ "$VERBOSITY" = "none" ] && VERBOSITY=""
+          ansible-playbook playbook-deploy-docker-dev.yml \
+            -i ./inventory/inventory.yml \
+            -e "msp_source_path=$GITHUB_WORKSPACE/msp_engineering" \
+            $VERBOSITY
+        env:
+          MSP_DB_PASSWORD_DEV: ${{ secrets.MSP_DB_PASSWORD_DEV }}
+          MSP_APP_ENV: ${{ secrets.MSP_APP_ENV }}
+          MSP_CF_TUNNEL_TOKEN_DEV: ${{ secrets.MSP_CF_TUNNEL_TOKEN_DEV }}
+
+      - name: Remove SSH key and venv
+        if: always()
+        run: |
+          rm -f ~/.ssh/runner_key
+          sudo rm -rf $ANSIBLE_VENV_NAME
