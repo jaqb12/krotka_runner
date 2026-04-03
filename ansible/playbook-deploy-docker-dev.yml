@@ -89,6 +89,7 @@
         up -d --build
       environment:
         MSP_DB_PASSWORD_DEV: "{{ lookup('env', 'MSP_DB_PASSWORD_DEV') }}"
+        TUNNEL_TOKEN: "{{ lookup('env', 'MSP_CF_TUNNEL_TOKEN_DEV') | regex_replace('^TUNNEL_TOKEN=', '') }}"
       async: 600
       poll: 15
       register: compose_result
