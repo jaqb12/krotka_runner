@@ -24,7 +24,7 @@ on:
       - deploy-msp-dev
 
 jobs:
-  deploy-docker-dev:
+  deploy-docker-msp-dev:
     name: Deploy Docker Dev to lsrv-01
     runs-on: self-hosted
 

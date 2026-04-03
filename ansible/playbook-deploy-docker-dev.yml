@@ -20,6 +20,21 @@
       loop:
         - "{{ deploy_dir }}/docker"
 
+    - name: Sync app source to lsrv-01
+      synchronize:
+        src: "{{ msp_source_path }}/"
+        dest: "{{ deploy_dir }}/"
+        delete: true
+        recursive: true
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=__pycache__"
+          - "--exclude=*.pyc"
+          - "--exclude=.venv"
+          - "--exclude=node_modules"
+          - "--exclude=.env"
+          - "--exclude=docker/.env.tunnel.dev"
+
     - name: Write .env to lsrv-01
       copy:
         content: "{{ lookup('env', 'MSP_APP_ENV') }}"
@@ -35,18 +50,6 @@
         mode: '0600'
         owner: root
         group: root
-
-    - name: Copy docker-compose.yml to lsrv-01
-      copy:
-        src: "{{ msp_source_path }}/docker/docker-compose.yml"
-        dest: "{{ deploy_dir }}/docker/docker-compose.yml"
-        mode: '0644'
-
-    - name: Copy docker-compose.dev.yml to lsrv-01
-      copy:
-        src: "{{ msp_source_path }}/docker/docker-compose.dev.yml"
-        dest: "{{ deploy_dir }}/docker/docker-compose.dev.yml"
-        mode: '0644'
 
     - name: Get running containers with prefix
       command: docker ps -q -f "name={{ container_prefix }}"
