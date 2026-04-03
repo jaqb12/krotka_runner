@@ -1,0 +1,78 @@
+name: Deploy Docker DB Dev
+
+# Deploys the MSP_enginering docker-db-dev stack to lsrv-01 via Ansible.
+# Workflow clones MSP_enginering (docker-db-dev branch), checks for existing
+# containers/images, removes them, then builds and starts the stack.
+
+on:
+  workflow_dispatch:
+    inputs:
+      verbosity:
+        description: 'Ansible verbosity flag (e.g. -v, -vv, or leave blank)'
+        required: false
+        default: ''
+
+jobs:
+  deploy-docker-db-dev:
+    name: Deploy Docker DB Dev to lsrv-01
+    runs-on: self-hosted
+
+    env:
+      ANSIBLE_PATH: './ansible'
+      ANSIBLE_VENV_NAME: 'ansible_venv'
+
+    steps:
+      - name: Checkout krotka_runner
+        uses: actions/checkout@v4
+
+      - name: Clone MSP_enginering docker-db-dev branch
+        uses: actions/checkout@v4
+        with:
+          repository: jaqb12/MSP_enginering
+          ref: docker-db-dev
+          path: msp_engineering
+          token: ${{ secrets.MSP_ENGINEERING_REPO }}
+
+      - name: Display host info
+        run: |
+          echo "Runner: $(hostname)"
+          uptime
+          df -h /
+
+      - name: Write SSH private key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RUNNER_SSH_PRIVATE_KEY }}" > ~/.ssh/runner_key
+          chmod 600 ~/.ssh/runner_key
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y python3-pip rsync
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible in venv
+        run: |
+          python -m venv $ANSIBLE_VENV_NAME
+          source $ANSIBLE_VENV_NAME/bin/activate
+          pip install --upgrade pip
+          pip install -r ./ansible/requirements.txt
+
+      - name: Run Ansible playbook
+        run: |
+          source $ANSIBLE_VENV_NAME/bin/activate
+          cd $ANSIBLE_PATH
+          ansible-playbook playbook-deploy-docker-db-dev.yml \
+            -i ./inventory/inventory.yml \
+            -e "msp_source_path={{ playbook_dir }}/../../msp_engineering" \
+            ${{ inputs.verbosity || '' }}
+        env:
+          MSP_DB_PASSWORD_DEV: ${{ secrets.MSP_DB_PASSWORD_DEV }}
+
+      - name: Remove SSH key and venv
+        if: always()
+        run: |
+          rm -f ~/.ssh/runner_key
+          sudo rm -rf $ANSIBLE_VENV_NAME
