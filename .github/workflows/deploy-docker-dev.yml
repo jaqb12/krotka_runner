@@ -1,4 +1,4 @@
-name: Deploy Docker Dev
+name: Deploy MSP Docker Dev
 
 # Deploys the MSP_enginering app dev stack to lsrv-01 via Ansible.
 # Triggered manually or automatically when MSP_enginering development branch is updated
@@ -21,7 +21,7 @@ on:
           - -vvv
   repository_dispatch:
     types:
-      - deploy-dev
+      - deploy-msp-dev
 
 jobs:
   deploy-docker-dev:
