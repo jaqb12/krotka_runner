@@ -8,9 +8,14 @@ on:
   workflow_dispatch:
     inputs:
       verbosity:
-        description: 'Ansible verbosity flag (e.g. -v, -vv, or leave blank)'
+        description: 'Ansible verbosity level'
         required: false
-        default: ''
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - -v
+          - -vvv
 
 jobs:
   deploy-docker-db-dev:
@@ -64,10 +69,12 @@ jobs:
         run: |
           source $ANSIBLE_VENV_NAME/bin/activate
           cd $ANSIBLE_PATH
+          VERBOSITY="${{ inputs.verbosity }}"
+          [ "$VERBOSITY" = "none" ] && VERBOSITY=""
           ansible-playbook playbook-deploy-docker-db-dev.yml \
             -i ./inventory/inventory.yml \
             -e "msp_source_path=$GITHUB_WORKSPACE/msp_engineering" \
-            ${{ inputs.verbosity || '' }}
+            $VERBOSITY
         env:
           MSP_DB_PASSWORD_DEV: ${{ secrets.MSP_DB_PASSWORD_DEV }}
 
