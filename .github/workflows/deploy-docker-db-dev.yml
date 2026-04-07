@@ -10,7 +10,7 @@ on:
       verbosity:
         description: 'Ansible verbosity level'
         required: false
-        default: 'none'
+        default: '-v'
         type: choice
         options:
           - none
@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: jaqb12/MSP_enginering
-          ref: docker-db-dev
+          ref: development
           path: msp_engineering
           token: ${{ secrets.MSP_ENGINEERING_REPO }}
 
