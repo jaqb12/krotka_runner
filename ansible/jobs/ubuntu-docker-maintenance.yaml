@@ -1,4 +1,4 @@
-# --- A: Pre-reboot Docker info ---
+# --- A: Pre-reboot Docker info + cleanup (prune BEFORE stop) ---
 
 - name: Get Docker host info (containers, images, volumes)
   community.docker.docker_host_info:
@@ -30,9 +30,22 @@
     msg: "{{ docker_df_before.stdout_lines }}"
   tags: docker
 
+# Prune BEFORE stop — only cleans up already-dead containers, not the ones we're about to stop
+- name: Prune dangling images
+  command: docker image prune -f
+  register: image_prune
+  changed_when: "'deleted' in image_prune.stdout"
+  tags: docker
+
+- name: Prune unused anonymous volumes
+  command: docker volume prune -f
+  register: volume_prune
+  changed_when: "'deleted' in volume_prune.stdout"
+  tags: docker
+
 # --- B: Graceful stop all running containers ---
 
-- name: Get list of running container IDs (to restore after reboot)
+- name: Get list of running container IDs
   command: docker ps -q
   register: running_container_ids
   changed_when: false
@@ -74,7 +87,7 @@
     msg: "lsrv-01 is back online after reboot"
   tags: docker
 
-# --- D: Verify containers recovered after reboot ---
+# --- D: Verify containers recovered after reboot (restart policy handles this) ---
 
 - name: Get all containers after reboot (running and stopped)
   command: docker ps -a --format "{{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}"
@@ -96,25 +109,7 @@
       - "Running: {{ running_after_reboot.stdout_lines | join(', ') | default('none') }}"
   tags: docker
 
-# --- E: Docker cleanup (prune) ---
-
-- name: Prune dangling images
-  command: docker image prune -f
-  register: image_prune
-  changed_when: "'deleted' in image_prune.stdout"
-  tags: docker
-
-- name: Prune stopped containers
-  command: docker container prune -f
-  register: container_prune
-  changed_when: "'deleted' in container_prune.stdout"
-  tags: docker
-
-- name: Prune unused anonymous volumes
-  command: docker volume prune -f
-  register: volume_prune
-  changed_when: "'deleted' in volume_prune.stdout"
-  tags: docker
+# --- E: Get disk usage after cleanup ---
 
 - name: Get disk usage after cleanup
   command: docker system df --format "{{ '{{' }}.Type{{ '}}' }}\t{{ '{{' }}.Size{{ '}}' }}\t{{ '{{' }}.Reclaimable{{ '}}' }}"
