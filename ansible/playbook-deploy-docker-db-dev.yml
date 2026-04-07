@@ -59,6 +59,44 @@
       poll: 15
       register: compose_result
 
+    - name: Write .env.service for systemd (compose interpolation vars)
+      copy:
+        dest: "{{ deploy_dir }}/.env.service"
+        mode: '0600'
+        owner: root
+        group: root
+        content: |
+          MSP_DB_PASSWORD_DEV={{ lookup('env', 'MSP_DB_PASSWORD_DEV') }}
+
+    - name: Create systemd service container-msp-db-dev
+      copy:
+        dest: /etc/systemd/system/container-msp-db-dev.service
+        mode: '0644'
+        owner: root
+        group: root
+        content: |
+          [Unit]
+          Description=MSP DB Dev (postgres)
+          Requires=docker.service
+          After=docker.service network-online.target
+
+          [Service]
+          WorkingDirectory={{ deploy_dir }}
+          EnvironmentFile={{ deploy_dir }}/.env.service
+          ExecStart=docker compose -f docker/docker-compose.db-dev.yml up
+          ExecStop=docker compose -f docker/docker-compose.db-dev.yml stop
+          Restart=no
+          TimeoutStopSec=60
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd and enable container-msp-db-dev
+      systemd:
+        name: container-msp-db-dev
+        daemon_reload: true
+        enabled: true
+
     - name: Wait for services to be ready
       pause:
         seconds: 10
