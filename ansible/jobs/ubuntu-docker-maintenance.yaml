@@ -74,11 +74,12 @@
     msg: "lsrv-01 is back online after reboot"
   tags: docker
 
-# --- D: Start exactly the containers that were running before reboot ---
+# --- D: Verify containers recovered after reboot ---
 
-- name: Start previously running containers
-  command: docker start {{ running_container_ids.stdout_lines | join(' ') }}
-  when: running_container_ids.stdout_lines | length > 0
+- name: Get all containers after reboot (running and stopped)
+  command: docker ps -a --format "{{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}"
+  register: all_containers_after_reboot
+  changed_when: false
   tags: docker
 
 - name: Get running containers after reboot
@@ -91,7 +92,8 @@
   debug:
     msg:
       - "=== Docker Status (post-reboot) ==="
-      - "Running containers: {{ running_after_reboot.stdout_lines | join(', ') | default('none') }}"
+      - "All containers: {{ all_containers_after_reboot.stdout_lines | join(' | ') | default('none') }}"
+      - "Running: {{ running_after_reboot.stdout_lines | join(', ') | default('none') }}"
   tags: docker
 
 # --- E: Docker cleanup (prune) ---
@@ -137,10 +139,13 @@
         - title: ":whale: lsrv-01 Docker Maintenance Complete ({{ ansible_facts['hostname'] }})"
           color: 3066993
           fields:
-            - name: "Containers stopped (pre-reboot)"
+            - name: "Containers stopped before reboot"
               value: "{{ running_container_names.stdout_lines | join(', ') | default('none') }} ({{ running_container_ids.stdout_lines | length }} total)"
               inline: false
-            - name: "Containers running (post-reboot)"
+            - name: "All containers after reboot"
+              value: "{{ all_containers_after_reboot.stdout_lines | join('\n') | default('none') | truncate(300) }}"
+              inline: false
+            - name: "Running after reboot"
               value: "{{ running_after_reboot.stdout_lines | join(', ') | default('none') }}"
               inline: false
             - name: "Images pruned"
