@@ -94,6 +94,16 @@
       poll: 15
       register: compose_result
 
+    - name: Remove source files after build (keep only compose files and secrets)
+      shell: |
+        find {{ deploy_dir }} -mindepth 1 -maxdepth 1 \
+          ! -name '.env' \
+          ! -name 'docker' \
+          -exec rm -rf {} +
+      args:
+        executable: /bin/bash
+
+
     - name: Wait for services to be ready
       pause:
         seconds: 15
