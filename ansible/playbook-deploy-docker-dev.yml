@@ -98,11 +98,40 @@
       shell: |
         find {{ deploy_dir }} -mindepth 1 -maxdepth 1 \
           ! -name '.env' \
+          ! -name '.env.service' \
           ! -name 'docker' \
           -exec rm -rf {} +
       args:
         executable: /bin/bash
 
+    - name: Create systemd service container-msp-dev
+      copy:
+        dest: /etc/systemd/system/container-msp-dev.service
+        mode: '0644'
+        owner: root
+        group: root
+        content: |
+          [Unit]
+          Description=MSP App Dev
+          Requires=docker.service container-msp-db-dev.service
+          After=docker.service container-msp-db-dev.service
+
+          [Service]
+          WorkingDirectory={{ deploy_dir }}
+          EnvironmentFile={{ deploy_dir }}/.env.service
+          ExecStart=docker compose -p {{ compose_project }} -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up
+          ExecStop=docker compose -p {{ compose_project }} -f docker/docker-compose.yml -f docker/docker-compose.dev.yml stop
+          Restart=no
+          TimeoutStopSec=60
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd and enable container-msp-dev
+      systemd:
+        name: container-msp-dev
+        daemon_reload: true
+        enabled: true
 
     - name: Wait for services to be ready
       pause:
